@@ -7,8 +7,14 @@ DE CARRO E PEDESTRE
 
 */
 
-void escreve_veiculo(VEICULO *v);
-void escreve_linha(LINHA *l);
+void escreve_header_veiculo(FILE *fp, HEADER_VEICULO *hv);
+void escreve_header_linha(FILE *fp, HEADER_LINHA *hl);
+
+// Indentificar campos nulos como "NULO" //
+void insere_veiculo(FILE *fp, VEICULO *v);
+
+void insere_linha(FILE *fp, LINHA *v);
+//////////////////////////////////////////
 
 
 #endif
