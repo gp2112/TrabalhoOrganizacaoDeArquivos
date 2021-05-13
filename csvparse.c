@@ -4,21 +4,6 @@
 #include "dados.h"
 
 #define BUFFER_SIZE 64
-/*
-typedef struct {
-
-	int codLinha;
-	char aceitaCartao;
-	char *nomeLinha;
-	char *corLinha;
-	char removido;
-	int tamanhoRegistro;
-	int tamanhoNome;
-	int tamanhoCor;
-
-} LINHA;
-
-*/
 
 char *readline(FILE *in) {
 	char *buffer = (char *)malloc(BUFFER_SIZE * sizeof(char));
@@ -65,7 +50,7 @@ LINHA *get_linha(FILE *fp) {
 	linha->tamanhoNome = strlen(linha->nomeLinha);
 	linha->tamanhoCor = strlen(linha->corLinha);
 
-	/////////linha->tamanhoRegistro = ;//////
+	linha->tamanhoRegistro = 18 + linha->tamanhoNome + linha->tamanhoCor;
 
 	free(line);
 
