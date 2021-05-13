@@ -10,5 +10,4 @@ DE VEICULOS E LINHAS
 void escreve_header_veiculo(FILE *fp, HEADER_VEICULO *hv);
 void escreve_header_linha(FILE *fp, HEADER_LINHA *hl);
 
-
 #endif

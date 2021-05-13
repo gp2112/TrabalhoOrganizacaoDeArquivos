@@ -9,8 +9,9 @@ STRUCTS DE CARRO E PEDESTRE
 
 #include "dados.h"
 
+// Lê o próximo veículo/linha do csv
 
-VEICULO *get_veiculo(FILE *fp); // Lê o próximo veículo do csv
+VEICULO *get_veiculo(FILE *fp); 
 
 LINHA *get_linha(FILE *fp);
 
