@@ -2,21 +2,6 @@
 #include <stdlib.h>
 #include "dados.h"
 
-/*
-typedef struct {
-
-	int codLinha;
-	char aceitaCartao;
-	char *nomeLinha;
-	char *corLinha;
-	char removido;
-	int tamanhoRegistro;
-	int tamanhoNome;
-	int tamanhoCor;
-
-} LINHA;
-
-*/
 
 LINHA *bin_get_linha(FILE *fp, int cod) {
 	char removido;

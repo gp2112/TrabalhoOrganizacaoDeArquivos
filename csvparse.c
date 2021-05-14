@@ -39,11 +39,11 @@ LINHA *get_linha(FILE *fp) {
 	linha->aceitaCartao = temp[0];
 
 	temp = strtok(NULL, ",");
-	linha->nomeLinha = (char *)calloc(strlen(temp), sizeof(char));
+	linha->nomeLinha = (char *)calloc(strlen(temp)+1, sizeof(char));
 	linha->nomeLinha = strcpy(linha->nomeLinha, temp);
 
 	temp = strtok(NULL, ",");
-	linha->corLinha = (char *)calloc(strlen(temp), sizeof(char));
+	linha->corLinha = (char *)calloc(strlen(temp)+1, sizeof(char));
 	linha->corLinha = strcpy(linha->corLinha, temp);
 
 	linha->removido = '0';
