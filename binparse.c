@@ -3,8 +3,8 @@
 #include "dados.h"
 
 
-HEADER_LINHA *bin_get_header_linha(FILA *fp) {
-	HEADER_LINHA *header = (HEADER_LINHA *)malloc(sizeof(HEADER_LINHA));
+LINHA_HEADER *bin_get_header_linha(FILA *fp) {
+	LINHA_HEADER *header = (LINHA_HEADER *)malloc(sizeof(LINHA_HEADER));
 
 	// se o ponteiro não estiver no início do arquivo, aponta para o 0
 	if (ftell(fp) > 0) fseek(fp, 0, SEEK_SET);
