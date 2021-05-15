@@ -6,12 +6,14 @@
 #define BUFFER_SIZE 64
 
 char *readline(FILE *in) {
-	char *buffer = (char *)malloc(BUFFER_SIZE * sizeof(char));
+	char *buffer = NULL;
 	char c; int i=0;
 
-	while ((c=fgetc(in)) == '\n' || c=='\r')
-		if (c == EOF) return NULL;
+	while ((c=fgetc(in)) == '\n' || c=='\r');
+	if (c==EOF) return NULL;
+		
 
+	buffer = (char *)malloc(BUFFER_SIZE * sizeof(char));
 
 	do {
 		if (i>0 && i%BUFFER_SIZE == 0)
@@ -27,13 +29,33 @@ char *readline(FILE *in) {
 
 
 LINHA *get_linha(FILE *fp) {
-	LINHA *linha = (LISTA *)malloc(sizeof(LISTA));
+	char *line, *temp;
 
-	char *line = readline(fp), *temp=NULL;
+	// se tiver no ínicio do arquivo, ignora o header do csv
+	if (ftell(fp) == 0) {
+		line = readline(fp);
+		free(line);
+	}
+
+	line = readline(fp), temp=NULL;
+
 	if (line == NULL) return NULL;
+	if (strlen(line) == 0) {
+		free(line);
+		return NULL;
+	}
+	//printf("%d\n", EOF);
+	LINHA *linha = (LINHA *)malloc(sizeof(LINHA));
 
 	temp = strtok(line, ",");
+	if (temp[0] == '*') {
+		linha->removido = '1';
+		temp++; // desloca ponteiro para o próximo byte
+	}
+	else linha->removido = '0';
 	linha->codLinha = atoi(temp);
+	// verifica se está removido
+
 
 	temp = strtok(NULL, ",");
 	linha->aceitaCartao = temp[0];
@@ -42,11 +64,12 @@ LINHA *get_linha(FILE *fp) {
 	linha->nomeLinha = (char *)calloc(strlen(temp)+1, sizeof(char));
 	linha->nomeLinha = strcpy(linha->nomeLinha, temp);
 
+
 	temp = strtok(NULL, ",");
 	linha->corLinha = (char *)calloc(strlen(temp)+1, sizeof(char));
 	linha->corLinha = strcpy(linha->corLinha, temp);
 
-	linha->removido = '0';
+	
 	linha->tamanhoNome = strlen(linha->nomeLinha);
 	linha->tamanhoCor = strlen(linha->corLinha);
 
@@ -55,4 +78,22 @@ LINHA *get_linha(FILE *fp) {
 	free(line);
 
 	return linha;
+}
+
+// aloca o header do csv na descricao
+void header_linha_get_descr(FILE *fp, LINHA_HEADER *header) {
+	if (ftell(fp) > 0) fseek(fp, 0, SEEK_SET);
+	char *line = readline(fp), *temp=NULL;
+
+	temp = strtok(line, ",");
+	strcpy(header->descreveCodigo, temp);
+	temp = strtok(NULL, ",");
+	strcpy(header->descreveCartao, temp);
+	temp = strtok(NULL, ",");
+	strcpy(header->descreveNome, temp);
+	temp = strtok(NULL, ",");
+	strcpy(header->descreveCor, temp);
+
+
+	free(line);
 }
