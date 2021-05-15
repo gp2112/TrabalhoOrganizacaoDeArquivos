@@ -1,8 +1,8 @@
 #ifndef DADOS_H
 #define DADOS_H
 
-#ifndef uint64
-#define uint64 long long int
+#ifndef int64
+#define int64 long long int
 #endif
 
 typedef struct {
