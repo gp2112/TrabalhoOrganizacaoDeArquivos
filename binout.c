@@ -2,7 +2,14 @@
 #include <stdlib.h>
 #include "dados.h"
 
-// FALTA TRATAR O LIXO!!!!!!
+/* substitui o lixo por @
+ str -> ponteiro para o final da string (\0)
+ n -> quantidade de "lixo" (espaço alocado - (strlen+1))
+*/
+void preenche_lixo(char *str, int n) {
+	for (int i=1; i<=n; i++)
+		str[i] = '@';
+}
 
 // escreve todo o header 
 void escreve_header_linha(FILE *fp, LINHA_HEADER *header) {
@@ -54,9 +61,9 @@ void escreve_linha(FILE *fp, LINHA_HEADER *header, LINHA *linha) {
 	fwrite(&linha->codLinha, sizeof(int), 1, fp);
 	fwrite(&linha->aceitaCartao, sizeof(char), 1, fp);
 	fwrite(&linha->tamanhoNome, sizeof(int), 1, fp);
-	fwrite(linha->nomeLinha, sizeof(char), linha->tamanhoNome+1, fp);
+	fwrite(linha->nomeLinha, sizeof(char), linha->tamanhoNome, fp);
 	fwrite(&linha->tamanhoCor, sizeof(int), 1, fp);
-	fwrite(linha->corLinha, sizeof(char), linha->tamanhoCor+1, fp);
+	fwrite(linha->corLinha, sizeof(char), linha->tamanhoCor, fp);
 
 	header->byteProxReg = ftell(fp);
 	if (linha->removido == '1') {
