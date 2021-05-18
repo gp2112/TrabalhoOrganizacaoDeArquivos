@@ -61,5 +61,8 @@ typedef struct {
 
 } LINHA;
 
+void linha_delete(LINHA **linha);
+
+void veiculo_delete(VEICULO **veiculo);
 
 #endif

@@ -5,7 +5,8 @@
 
 #define BUFFER_SIZE 64
 
-char *readline(FILE *in) { // funcao para ler um arquivo ate uma quebra de linha e armazenar em um buffer e retornar tudo log em seguida
+// funcao para ler um arquivo ate uma quebra de linha e armazenar em um buffer e retornar tudo log em seguida
+char *readline(FILE *in) { 
 	char *buffer = NULL;
 	char c; int i = 0;
 
