@@ -1,25 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "csvparse.h"
 #include "binout.h"
+#include "binparse.h"
 
-
-LINHA_HEADER *header_linha_create(FILE *fp) {
-	LINHA_HEADER *header = (LINHA_HEADER *)malloc(sizeof(LINHA_HEADER));
-
-	header->status = '0';
-	header->nroRegistros = 0;
-	header->nroRegRemovidos = 0;
-	header->byteProxReg = 82;
-
-	header_linha_get_descr(fp, header);
-
-	return header;
-}
 
 int main(int argc, char const *argv[]) {
 
-	FILE *f_csv = fopen(argv[1], "r"),
+	/*FILE *f_csv = fopen(argv[1], "r"),
 		 *f_bin = fopen(argv[2], "wb");
 
 
@@ -44,14 +33,34 @@ int main(int argc, char const *argv[]) {
 
 		escreve_linha(f_bin, header_linha, linha);
 
-		free(linha->nomeLinha); free(linha->corLinha);
-		free(linha);
+		linha_delete(&linha);
 	}
 
 	free(header_linha);
 	header_linha_alter_status(f_bin, '1');
 	fclose(f_bin);
-	fclose(f_csv);
+	fclose(f_csv);*/
+	FILE *f = fopen(argv[1], "rb");
+	LINHA *linha = NULL;
+
+	while (1) {
+		linha = bin_get_linha(f, argv[2], argv[3]);
+		
+		if (linha == NULL) break;
+
+		printf("%d ", linha->codLinha);
+		printf("%c ", linha->aceitaCartao);
+		printf("%s ", linha->nomeLinha);
+		printf("%s ", linha->corLinha);
+		printf("%c ", linha->removido);
+		printf("%d ", linha->tamanhoRegistro);
+		printf("%d ", linha->tamanhoNome);
+		printf("%d\n", linha->tamanhoCor);
+
+		linha_delete(&linha);
+	}
+
+	fclose(f);
 
 	return 0;
 }

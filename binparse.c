@@ -57,7 +57,8 @@ LINHA *bin_get_linha_by_cod(FILE *fp, int cod) {
 	while (1) {
 		linha = bin_read_linha(fp);
 		if (linha == NULL) return NULL;
-		
+
+
 		if (linha->removido != '0' && linha->codLinha==cod)
 			break;
 		linha_delete(&linha);
@@ -105,6 +106,7 @@ LINHA *bin_get_linha_by_cor(FILE *fp, char *cor) {
 	while (1) {
 		linha = bin_read_linha(fp);
 		if (linha == NULL) return NULL;
+		
 		if (linha->removido != '0' && strcmp(linha->corLinha, cor)==0)
 			break;
 		linha_delete(&linha);

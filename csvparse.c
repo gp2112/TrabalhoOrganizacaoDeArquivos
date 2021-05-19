@@ -51,10 +51,10 @@ LINHA *get_linha(FILE *fp) {
 
 	temp = strtok(line, ",");
 	if (temp[0] == '*') {
-		linha->removido = '1';
+		linha->removido = '0';
 		temp++; // desloca ponteiro para o próximo byte
 	}
-	else linha->removido = '0';
+	else linha->removido = '1';
 	linha->codLinha = atoi(temp);
 	// verifica se está removido
 
