@@ -91,6 +91,7 @@ LINHA *get_linha(FILE *fp) {
 }
 
 // aloca o header do csv na descricao
+// ???????? LEAK ?????????????????? ///////
 void header_linha_get_descr(FILE *fp, LINHA_HEADER *header) {
 	if (ftell(fp) > 0) fseek(fp, 0, SEEK_SET);
 	char *line = readline(fp), *temp=NULL;

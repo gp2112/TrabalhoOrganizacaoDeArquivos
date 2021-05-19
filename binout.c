@@ -2,9 +2,13 @@
 #include <stdlib.h>
 #include "dados.h"
 
-/* substitui o lixo por @
- str -> ponteiro para o final da string (\0)
- n -> quantidade de "lixo" (espaço alocado - (strlen+1))
+/*
+FALTA:
+
+funcoes veiculo-> escrever header
+				  escrever veiculo	
+				  alterar parametros do header veiculo
+				  inserir veiculo sempre no final do arquivo
 */
 
 // escreve todo o header 

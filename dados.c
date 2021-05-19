@@ -39,8 +39,11 @@ LINHA_HEADER *header_linha_create(FILE *fp) {
 
 // AAAA-MM-DD
 void get_mes_nome(char *date, char *mes_nome) {
-	date[4]=0; date[7]=0;
-	int mes = atoi(date+5);
+	// separa os parametros da data por 0 -> AAAA\0MM\0DD
+	date[4]='\0'; date[7]='\0';
+
+	int mes = atoi(date+5); 
+
 	switch (mes) {
 		case (1):
 			strcpy(mes_nome, "janeiro");

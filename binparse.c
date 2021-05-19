@@ -3,6 +3,15 @@
 #include <string.h>
 #include "dados.h"
 
+/*
+FALTA:
+
+funcoes veiculo-> ler header
+				  ler veiculo	
+				  busca de veiculo (prefixo, data, quantidadeLugares, modelo, categoria)
+
+*/
+
 
 LINHA_HEADER *bin_get_header_linha(FILE *fp) {
 	LINHA_HEADER *header = (LINHA_HEADER *)malloc(sizeof(LINHA_HEADER));
@@ -130,7 +139,8 @@ LINHA *bin_get_linha(FILE *fp, char *campo, char *value) {
 	if (strcmp(campo, "corLinha")==0)
 		return bin_get_linha_by_cor(fp, value);
 
-	return NULL;
+	// se nao for nenhum campo valido, retorna a proxima linha
+	return bin_read_linha(fp); 
 
 }
 

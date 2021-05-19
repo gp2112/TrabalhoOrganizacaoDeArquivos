@@ -15,7 +15,7 @@ void test_csv_bin_veiculo(const char* fname) {
 		veiculo = get_veiculo(f);
 		if (veiculo == NULL)
 			break;
-		
+
 		print_veiculo(veiculo);
 
 		veiculo_delete(&veiculo);
@@ -26,9 +26,9 @@ void test_csv_bin_veiculo(const char* fname) {
 
 int main(int argc, char const *argv[]) {
 
-	test_csv_bin_veiculo(argv[1]);
-
-	/*FILE *f_csv = fopen(argv[1], "r"),
+	//test_csv_bin_veiculo(argv[1]);
+	/*
+	FILE *f_csv = fopen(argv[1], "r"),
 		 *f_bin = fopen(argv[2], "wb");
 
 
@@ -59,7 +59,7 @@ int main(int argc, char const *argv[]) {
 	free(header_linha);
 	header_linha_alter_status(f_bin, '1');
 	fclose(f_bin);
-	fclose(f_csv);
+	fclose(f_csv);/*
 	FILE *f = fopen(argv[1], "rb");
 	LINHA *linha = NULL;
 
@@ -73,6 +73,11 @@ int main(int argc, char const *argv[]) {
 	}
 
 	fclose(f);*/
+	FILE *f = fopen("linhas.bin", "rb");
+	
+	fread(&tmp, sizeof(char), 0, f);
+	fclose(f);
+
 
 	return 0;
 }

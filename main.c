@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+
 int main(int argc, char const *argv[]) {
 	char temp1[10], temp2[10];
 	scanf("[,^\n]", temp1);
