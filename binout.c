@@ -6,10 +6,6 @@
  str -> ponteiro para o final da string (\0)
  n -> quantidade de "lixo" (espaço alocado - (strlen+1))
 */
-void preenche_lixo(char *str, int n) {
-	for (int i=1; i<=n; i++)
-		str[i] = '@';
-}
 
 // escreve todo o header 
 void escreve_header_linha(FILE *fp, LINHA_HEADER *header) {

@@ -22,8 +22,8 @@ typedef struct {
 
 typedef struct {
 
-	char prefixo[5];
-	char data[10]; // AAAA-MM-DD
+	char prefixo[6];
+	char data[11]; // AAAA-MM-DD
 	int quantidadeLugares;
 	int codLinha;
 	char *modelo;
@@ -70,5 +70,7 @@ LINHA_HEADER *header_linha_create(FILE *fp);
 VEICULO_HEADER *header_veiculo_create(FILE *fp);
 
 void print_linha(LINHA *linha);
+
+void print_veiculo(VEICULO *veiculo);
 
 #endif
