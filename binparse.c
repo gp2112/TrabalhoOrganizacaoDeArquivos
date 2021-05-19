@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "dados.h"
 
 
-LINHA_HEADER *bin_get_header_linha(FILA *fp) {
+LINHA_HEADER *bin_get_header_linha(FILE *fp) {
 	LINHA_HEADER *header = (LINHA_HEADER *)malloc(sizeof(LINHA_HEADER));
 
 	// se o ponteiro não estiver no início do arquivo, aponta para o 0
@@ -56,8 +57,10 @@ LINHA *bin_get_linha_by_cod(FILE *fp, int cod) {
 	while (1) {
 		linha = bin_read_linha(fp);
 		if (linha == NULL) return NULL;
+		
 		if (linha->removido != '0' && linha->codLinha==cod)
 			break;
+		linha_delete(&linha);
 	}
 
 	return linha;
@@ -72,6 +75,8 @@ LINHA *bin_get_linha_by_cartao(FILE *fp, char aceitaCartao) {
 		if (linha == NULL) return NULL;
 		if (linha->removido != '0' && linha->aceitaCartao == aceitaCartao)
 			break;
+		linha_delete(&linha);
+
 	}
 
 	return linha;
@@ -87,6 +92,8 @@ LINHA *bin_get_linha_by_nome(FILE *fp, char *nomeLinha) {
 		if (linha == NULL) return NULL;
 		if (linha->removido != '0' && strcmp(linha->nomeLinha, nomeLinha)==0)
 			break;
+		linha_delete(&linha);
+
 	}
 
 	return linha;
@@ -100,6 +107,8 @@ LINHA *bin_get_linha_by_cor(FILE *fp, char *cor) {
 		if (linha == NULL) return NULL;
 		if (linha->removido != '0' && strcmp(linha->corLinha, cor)==0)
 			break;
+		linha_delete(&linha);
+
 	}
 
 	return linha;
@@ -110,7 +119,7 @@ LINHA *bin_get_linha(FILE *fp, char *campo, char *value) {
 	if (strcmp(campo, "codLinha") == 0)
 		return bin_get_linha_by_cod(fp, atoi(value));
 
-	if (strcmp(campo, "aceitaCartao"))
+	if (strcmp(campo, "aceitaCartao")==0)
 		return bin_get_linha_by_cartao(fp, value[0]);
 
 	if (strcmp(campo, "nomeLinha")==0)
@@ -119,7 +128,7 @@ LINHA *bin_get_linha(FILE *fp, char *campo, char *value) {
 	if (strcmp(campo, "corLinha")==0)
 		return bin_get_linha_by_cor(fp, value);
 
-	return linha;
+	return NULL;
 
 }
 

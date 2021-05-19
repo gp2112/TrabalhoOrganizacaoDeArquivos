@@ -117,7 +117,7 @@ VEICULO *get_veiculo(FILE *fp){
 	}
 	VEICULO *vehicle = (VEICULO*)malloc(sizeof(VEICULO));
 
-	temp = strtok(linha,',');
+	temp = strtok(linha,",");
 	if (temp[0] == '*') {
 		vehicle->removido = '1';
 		temp++; // desloca ponteiro para o próximo byte
@@ -138,7 +138,7 @@ VEICULO *get_veiculo(FILE *fp){
 		}
 	}
 	
-	temp = strtok(NULL,',');
+	temp = strtok(NULL,",");
 	strcpy(vehicle->data,temp);
 	if (strlen(temp) != 10)
 	{
@@ -150,16 +150,16 @@ VEICULO *get_veiculo(FILE *fp){
 
 		}
 	}
-	temp = strtok(NULL,','); 
+	temp = strtok(NULL,","); 
 	vehicle->quantidadeLugares = atoi(temp);
-	temp = strtok(NULL,','); 
+	temp = strtok(NULL,","); 
 	vehicle->codLinha = atoi(temp);
-	temp = strtok(NULL,','); 
+	temp = strtok(NULL,","); 
 	vehicle->tamanhoModelo = atoi(temp);
-	temp = strtok(NULL,','); 
+	temp = strtok(NULL,","); 
 	vehicle->modelo = (char*) calloc(strlen(temp)+1,sizeof(char));
 	vehicle->modelo = strcpy(vehicle->modelo,temp);
-	temp = strtok(NULL,','); 
+	temp = strtok(NULL,","); 
 	vehicle->tamanhoCategoria = atoi(temp);
 	vehicle->categoria = (char*) calloc(strlen(temp)+1,sizeof(char));
 	vehicle->categoria = strcpy(vehicle->categoria,temp);

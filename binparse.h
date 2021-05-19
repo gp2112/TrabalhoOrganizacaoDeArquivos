@@ -4,7 +4,7 @@
 #include "dados.h"
 
 
-VEICULO_HEADER *bin_get_header_linha(FILE *fp);
+VEICULO_HEADER *bin_get_header_veiculo(FILE *fp);
 
 VEICULO *bin_get_veiculo(FILE *fp, int codLinha);
 
@@ -14,4 +14,4 @@ LINHA *bin_get_linha(FILE *fp, char *campo, char *value);
 
 
 
-#ifndef
+#endif
