@@ -69,4 +69,6 @@ LINHA_HEADER *header_linha_create(FILE *fp);
 
 VEICULO_HEADER *header_veiculo_create(FILE *fp);
 
+void print_linha(LINHA *linha);
+
 #endif

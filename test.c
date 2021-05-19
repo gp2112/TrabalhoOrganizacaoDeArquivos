@@ -47,15 +47,7 @@ int main(int argc, char const *argv[]) {
 		linha = bin_get_linha(f, argv[2], argv[3]);
 		
 		if (linha == NULL) break;
-
-		printf("%d ", linha->codLinha);
-		printf("%c ", linha->aceitaCartao);
-		printf("%s ", linha->nomeLinha);
-		printf("%s ", linha->corLinha);
-		printf("%c ", linha->removido);
-		printf("%d ", linha->tamanhoRegistro);
-		printf("%d ", linha->tamanhoNome);
-		printf("%d\n", linha->tamanhoCor);
+		print_linha(linha);
 
 		linha_delete(&linha);
 	}
