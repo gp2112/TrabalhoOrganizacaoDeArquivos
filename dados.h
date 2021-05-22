@@ -7,7 +7,7 @@
 
 typedef struct {
 
-	char status;
+	char status; 
 	int64 byteProxReg;
 	int nroRegistros;
 	int nroRegRemovidos;
@@ -22,7 +22,7 @@ typedef struct {
 
 typedef struct {
 
-	char prefixo[6];
+	char prefixo[6]; 
 	char data[11]; // AAAA-MM-DD
 	int quantidadeLugares;
 	int codLinha;
