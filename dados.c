@@ -6,7 +6,7 @@
 #include "binparse.h"
 
 
-// libera memória do veiculo/linha //
+// libera memória da linha //
 void linha_delete(LINHA **linha) {
 	if ((*linha)->nomeLinha != NULL)
 		free((*linha)->nomeLinha);
@@ -16,6 +16,7 @@ void linha_delete(LINHA **linha) {
 	*linha = NULL;
 }
 
+// libera memória do veiculo//
 void veiculo_delete(VEICULO **veiculo) {
 	free((*veiculo)->modelo);
 	free((*veiculo)->categoria);
