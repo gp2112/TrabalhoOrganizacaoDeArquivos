@@ -8,8 +8,10 @@
 
 // libera memória do veiculo/linha //
 void linha_delete(LINHA **linha) {
-	free((*linha)->nomeLinha);
-	free((*linha)->corLinha);
+	if ((*linha)->nomeLinha != NULL)
+		free((*linha)->nomeLinha);
+	if ((*linha)->corLinha != NULL)
+		free((*linha)->corLinha);
 	free(*linha);
 	*linha = NULL;
 }
@@ -86,11 +88,11 @@ void get_mes_nome(char *date, char *mes_nome) {
 
 void print_linha(LINHA *linha) {
 	
-	if (strcmp(linha->nomeLinha, "NULO") == 0)
+	if (linha->nomeLinha == NULL)
 		printf("Nome da linha: campo com valor nulo\n");
 	else printf("Nome da linha: %s\n", linha->nomeLinha);
 
-	if (strcmp(linha->corLinha, "NULO") == 0)
+	if (linha->corLinha == NULL)
 		printf("Cor que descreve a linha: campo com valor nulo\n");
 	else printf("Cor que descreve a linha: %s\n", linha->corLinha);
 
@@ -111,15 +113,15 @@ void print_veiculo(VEICULO *veiculo) {
 		printf("Prefixo do veiculo: campo com valor nulo\n");
 	else printf("Prefixo do veiculo: %s\n", veiculo->prefixo);
 
-	if (strcmp(veiculo->modelo, "NULO")==0)
+	if (veiculo->modelo == NULL)
 		printf("Modelo do veiculo: campo com valor nulo\n");
 	else printf("Modelo do veiculo: %s\n", veiculo->modelo);
 
-	if (strcmp(veiculo->categoria, "NULO")==0)
+	if (veiculo->categoria == NULL)
 		printf("Categoria do veiculo: campo com valor nulo\n");
 	else printf("Categoria do veiculo: %s\n", veiculo->categoria);
 
-	if (strcmp(veiculo->data, "NULO")==0)
+	if (veiculo->data == NULL)
 		printf("Data de entrada do veiculo na frota: campo com valor nulo\n");
 	else {
 		char mes_nome[11]; get_mes_nome(veiculo->data, mes_nome);

@@ -71,19 +71,26 @@ LINHA *get_linha(FILE *fp) {
 	linha->aceitaCartao = temp[0];
 
 	temp = strtok(NULL, ",");
-	linha->nomeLinha = (char *)calloc(strlen(temp)+1, sizeof(char));
-	linha->nomeLinha = strcpy(linha->nomeLinha, temp);
-
+	if (strcmp(temp, "NULO")==0) {
+		linha->tamanhoNome = 0;
+		linha->nomeLinha = NULL;
+	} else {
+		linha->tamanhoNome = strlen(temp);
+		linha->nomeLinha = (char *)calloc(linha->tamanhoNome+1, sizeof(char));
+		linha->nomeLinha = strcpy(linha->nomeLinha, temp);
+	}
 
 	temp = strtok(NULL, ",");
-	linha->corLinha = (char *)calloc(strlen(temp)+1, sizeof(char));
-	linha->corLinha = strcpy(linha->corLinha, temp);
-
+	if (strcmp(temp, "NULO")==0) {
+		linha->tamanhoCor = 0;
+		linha->corLinha = NULL;
+	} else {
+		linha->tamanhoCor = strlen(temp);
+		linha->corLinha = (char *)calloc(linha->tamanhoCor+1, sizeof(char));
+		linha->corLinha = strcpy(linha->corLinha, temp);
+	}
 	
-	linha->tamanhoNome = strlen(linha->nomeLinha);
-	linha->tamanhoCor = strlen(linha->corLinha);
-
-	linha->tamanhoRegistro = 18 + linha->tamanhoNome + linha->tamanhoCor;
+	linha->tamanhoRegistro = 13 + linha->tamanhoNome + linha->tamanhoCor;
 
 	free(line);
 
@@ -151,16 +158,27 @@ VEICULO *get_veiculo(FILE *fp){
 	vehicle->codLinha = atoi(temp);
 
 
-	temp = strtok(NULL,","); 
-	vehicle->modelo = (char*) calloc(strlen(temp)+1,sizeof(char));
-	vehicle->modelo = strcpy(vehicle->modelo,temp);
-	vehicle->tamanhoModelo = strlen(temp);
+	temp = strtok(NULL,",");
+	if (strcmp(temp, "NULO")==0) {
+		vehicle->tamanhoModelo = 0;
+		vehicle->modelo = NULL;
+	} else {
+		vehicle->modelo = (char*) calloc(strlen(temp)+1,sizeof(char));
+		vehicle->modelo = strcpy(vehicle->modelo,temp);
+		vehicle->tamanhoModelo = strlen(temp);
+	}
 
 	temp = strtok(NULL,",");
 	
-	vehicle->categoria = (char*) calloc(strlen(temp)+1,sizeof(char));
-	vehicle->categoria = strcpy(vehicle->categoria,temp);
-	vehicle->tamanhoCategoria = strlen(temp);
+	if (strcmp(temp, "NULO")==0) {
+		vehicle->categoria = NULL;
+		vehicle->tamanhoCategoria = 0;
+	} else {
+		vehicle->categoria = (char*) calloc(strlen(temp)+1,sizeof(char));
+		vehicle->categoria = strcpy(vehicle->categoria,temp);
+		vehicle->tamanhoCategoria = strlen(temp);
+	}
+
 	vehicle->tamanhoRegistro = 31 + vehicle->tamanhoCategoria +vehicle->tamanhoModelo;
 
 	free(linha);

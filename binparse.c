@@ -127,6 +127,9 @@ LINHA *bin_get_linha_by_cor(FILE *fp, char *cor) {
 
 LINHA *bin_get_linha(FILE *fp, char *campo, char *value) {
 	
+	if (campo == NULL || value == NULL)
+		return bin_read_linha(fp); 
+
 	if (strcmp(campo, "codLinha") == 0)
 		return bin_get_linha_by_cod(fp, atoi(value));
 
@@ -140,7 +143,6 @@ LINHA *bin_get_linha(FILE *fp, char *campo, char *value) {
 		return bin_get_linha_by_cor(fp, value);
 
 	// se nao for nenhum campo valido, retorna a proxima linha
-	return bin_read_linha(fp); 
 
 }
 

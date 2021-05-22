@@ -53,8 +53,7 @@ void header_linha_alter_reg_removidos(FILE *fp, int nroRegRemovidos) {
 
 void escreve_linha(FILE *fp, LINHA_HEADER *header, LINHA *linha) {
 
-	if (ftell(fp) != header->byteProxReg) 
-		fseek(fp, header->byteProxReg, SEEK_SET);
+	fseek(fp, 1, SEEK_END);
 
 	fwrite(&linha->removido, sizeof(char), 1, fp);
 	fwrite(&linha->tamanhoRegistro, sizeof(int), 1, fp);
@@ -66,6 +65,7 @@ void escreve_linha(FILE *fp, LINHA_HEADER *header, LINHA *linha) {
 	fwrite(linha->corLinha, sizeof(char), linha->tamanhoCor, fp);
 
 	header->byteProxReg = ftell(fp);
+
 	if (linha->removido == '1') {
 		header->nroRegistros++;
 		header_linha_alter_regs(fp, header->nroRegistros);
