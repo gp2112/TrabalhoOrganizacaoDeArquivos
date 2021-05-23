@@ -193,6 +193,85 @@ ERROR operation6(char *bin_fname, char *param, char *value) {
 }
 
 ERROR operation7(char *bin_fname, int n) {
+	FILE *bin_f = fopen(bin_fname, "rb+");
+
+	if (bin_f == NULL)
+		return FILE_ERROR;
+
+	char *line, *temp;
+
+	VEICULO *veiculo = NULL;
+	VEICULO_HEADER *header = bin_get_header_veiculo(bin_f);
+
+	header->status = '0';
+	header_linha_alter_status(bin_f, '0');
+
+	for (int i=0; i<n; i++) {
+		veiculo = (VEICULO *)malloc(sizeof(VEICULO));
+
+		line = readline(stdin);
+		temp = strtok(line, " ");
+		if (strcmp(temp, "NULO")==0)
+			preenche_lixo(veiculo->prefixo, 0, 5);
+		else {
+			parse_str_aspas(&temp);
+			strcpy(veiculo->prefixo, temp);
+			preenche_lixo(veiculo->prefixo, strlen(veiculo->prefixo), 5);
+		}
+
+		temp = strtok(NULL, " ");
+		if (strcmp(temp, "NULO")==0)
+			preenche_lixo(veiculo->data, 0, 5);
+		else {
+			parse_str_aspas(&temp);
+			strcpy(veiculo->data, temp);
+			preenche_lixo(veiculo->data, strlen(veiculo->data), 5);
+		}
+		temp = strtok(NULL, " ");
+		if (strcmp(temp, "NULO")==0)
+			veiculo->quantidadeLugares=-1;
+		else
+			veiculo->quantidadeLugares = atoi(temp);
+
+		temp = strtok(NULL, " ");
+
+		if (strcmp(temp, "NULO")==0)
+			veiculo->codLinha=-1;
+		else
+			veiculo->codLinha = atoi(temp);
+
+		temp = strtok(NULL, " ");
+		if (strcmp(temp, "NULO")==0)
+			veiculo->modelo = NULL;
+		else {
+			char *aux = temp;
+			temp = parse_str_aspas(&aux);
+			veiculo->tamanhoModelo = strlen(aux);
+			veiculo->modelo = (char *)calloc(veiculo->tamanhoModelo+1, sizeof(char));
+			strcpy(veiculo->modelo, aux);
+		}
+
+		temp = strtok(NULL, " ");
+		if (strcmp(temp, "NULO")==0)
+			veiculo->categoria = NULL;
+		else {
+			char *aux = temp;
+			temp = parse_str_aspas(&aux);
+			veiculo->tamanhoCategoria = strlen(aux);
+			veiculo->categoria = (char *)calloc(veiculo->tamanhoCategoria+1, sizeof(char));
+			strcpy(veiculo->categoria, aux);
+		}
+
+		veiculo->tamanhoRegistro = 31 + veiculo->tamanhoCategoria + veiculo->tamanhoModelo;
+		veiculo->removido = '1';
+
+		escreve_veiculo(bin_f, header, veiculo);
+		veiculo_delete(&veiculo);
+		free(line);
+	}
+
+	header_veiculo_alter_status(bin_f, '1');
+	fclose(bin_f);
 	return 0;
 }
 
@@ -259,6 +338,7 @@ ERROR operation8(char *bin_fname, int n) {
 		
 		escreve_linha(bin_f, header, linha);
 		linha_delete(&linha);
+		free(line);
 	}
 
 	header->status = '1';

@@ -47,7 +47,7 @@ void escreve_linha(FILE *fp, LINHA_HEADER *header, LINHA *linha) {
 
 	if (ftell(fp) != header->byteProxReg) 
 		fseek(fp, header->byteProxReg, SEEK_SET);
-	printf("rm: %c\n", linha->removido);
+	
 	fwrite(&linha->removido, sizeof(char), 1, fp);
 	fwrite(&linha->tamanhoRegistro, sizeof(int), 1, fp);
 	fwrite(&linha->codLinha, sizeof(int), 1, fp);

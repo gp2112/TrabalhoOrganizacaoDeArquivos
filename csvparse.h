@@ -21,4 +21,6 @@ void header_linha_get_descr(FILE *fp, LINHA_HEADER *header);
 
 void header_veiculo_get_descr(FILE *fp, VEICULO_HEADER *header);
 
+void preenche_lixo(char *str, int i, int size);
+
 #endif

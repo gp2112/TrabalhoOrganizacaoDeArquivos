@@ -296,6 +296,7 @@ VEICULO *bin_get_veiculo_by_categoria(FILE *fp, char* categoria) {
 
 VEICULO *bin_get_veiculo(FILE *fp, char *campo, char *value) {
 	
+	// se nao for nenhum campo valido, retorna a proxima linha
 	if (campo == NULL || value == NULL)
 		return bin_read_veiculo(fp); 
 
@@ -314,6 +315,5 @@ VEICULO *bin_get_veiculo(FILE *fp, char *campo, char *value) {
 	if (strcmp(campo, "categoria")==0)
 		return bin_get_veiculo_by_categoria(fp, value);
 
-	// se nao for nenhum campo valido, retorna a proxima linha
 
 }
