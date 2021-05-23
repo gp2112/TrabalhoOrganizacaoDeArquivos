@@ -71,7 +71,6 @@ ERROR operation1(char *csv_fname, char *bin_fname) {
 
 	escreve_header_veiculo(bin_f, header);
 	while ((veiculo=get_veiculo(csv_f)) != NULL) {
-		print_veiculo(veiculo);
 		escreve_veiculo(bin_f, header, veiculo);
 		veiculo_delete(&veiculo);
 	}
@@ -272,6 +271,8 @@ ERROR operation7(char *bin_fname, int n) {
 
 	header_veiculo_alter_status(bin_f, '1');
 	fclose(bin_f);
+
+	binarioNaTela(bin_fname);
 	return 0;
 }
 
