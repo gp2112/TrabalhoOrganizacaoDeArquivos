@@ -198,7 +198,8 @@ ERROR operation7(char *bin_fname, int n) {
 
 ERROR operation8(char *bin_fname, int n) {
 
-	FILE *bin_f = fopen(bin_fname, "ab");
+	// abre o arquivo para ler o header
+	FILE *bin_f = fopen(bin_fname, "rb+");
 
 	if (bin_f == NULL)
 		return FILE_ERROR;
@@ -208,7 +209,7 @@ ERROR operation8(char *bin_fname, int n) {
 	LINHA *linha = NULL;
 
 	LINHA_HEADER *header = bin_get_header_linha(bin_f);
-	//printf("%lld\n", header->byteProxReg);
+
 	header->status = '0';
 	header_linha_alter_status(bin_f, '0');
 

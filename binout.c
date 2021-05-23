@@ -2,14 +2,6 @@
 #include <stdlib.h>
 #include "dados.h"
 
-/*
-FALTA:
-
-funcoes veiculo-> escrever header ok
-				  escrever veiculo	ok
-				  alterar parametros do header veiculo ok
-				  inserir veiculo sempre no final do arquivo ok
-*/
 
 // escreve todo o header 
 void escreve_header_linha(FILE *fp, LINHA_HEADER *header) {
@@ -55,7 +47,7 @@ void escreve_linha(FILE *fp, LINHA_HEADER *header, LINHA *linha) {
 
 	if (ftell(fp) != header->byteProxReg) 
 		fseek(fp, header->byteProxReg, SEEK_SET);
-
+	printf("rm: %c\n", linha->removido);
 	fwrite(&linha->removido, sizeof(char), 1, fp);
 	fwrite(&linha->tamanhoRegistro, sizeof(int), 1, fp);
 	fwrite(&linha->codLinha, sizeof(int), 1, fp);
