@@ -164,7 +164,7 @@ VEICULO_HEADER *bin_get_header_veiculo(FILE *fp){
 
 VEICULO *bin_read_veiculo(FILE *fp) {
 	// se o ponteiro estiver no cabeçalho, fssek para a primeira linha
-	if (ftell(fp) < 82) fseek(fp, 82, SEEK_SET);
+	if (ftell(fp) < 174) fseek(fp, 174, SEEK_SET);
 
 	VEICULO *veiculo = (VEICULO *)malloc(sizeof(VEICULO));
 
@@ -173,16 +173,25 @@ VEICULO *bin_read_veiculo(FILE *fp) {
 		return NULL;
 	}
 	fread(&veiculo->tamanhoRegistro, sizeof(int), 1, fp);
-	fread(veiculo->prefixo, sizeof(char), 6, fp);
-	fread(veiculo->data, sizeof(char), 11, fp);
+	fread(veiculo->prefixo, sizeof(char), 5, fp); veiculo->prefixo[5]='\0';
+	fread(veiculo->data, sizeof(char), 10, fp); veiculo->data[10]='\0';
 	fread(&veiculo->quantidadeLugares, sizeof(int), 1, fp);
 	fread(&veiculo->codLinha, sizeof(int), 1, fp);
 	
 	fread(&veiculo->tamanhoModelo, sizeof(int), 1, fp);
-	veiculo->modelo = (char*)calloc(veiculo->tamanhoModelo+1, sizeof(char));
-
-	fread(&veiculo->categoria, sizeof(int), 1, fp);
-	veiculo->categoria = (char*)calloc(veiculo->tamanhoCategoria+1, sizeof(char));
+	if (veiculo->tamanhoModelo == 0)
+		veiculo->modelo = NULL;
+	else {
+		veiculo->modelo = (char*)calloc(veiculo->tamanhoModelo+1, sizeof(char));
+		fread(veiculo->modelo, sizeof(char), veiculo->tamanhoModelo, fp);
+	}
+	fread(&veiculo->tamanhoCategoria, sizeof(int), 1, fp);
+	if (veiculo->tamanhoCategoria == 0)
+		veiculo->categoria = NULL;
+	else {
+		veiculo->categoria = (char*)calloc(veiculo->tamanhoCategoria+1, sizeof(char));
+		fread(veiculo->categoria, sizeof(char), veiculo->tamanhoCategoria, fp);
+	}
 
 	return veiculo;
 }
@@ -235,7 +244,7 @@ VEICULO *bin_get_veiculo_by_quantidadeLugares(FILE *fp, int quantidadeLugares) {
 			return NULL;
 		}
 
-		if (veiculo->removido != '0' && veiculo->quantidadeLugares == quantidadeLugares)){
+		if (veiculo->removido != '0' && veiculo->quantidadeLugares == quantidadeLugares){
 			break;
 		}
 		veiculo_delete(&veiculo);
@@ -254,7 +263,8 @@ VEICULO *bin_get_veiculo_by_modelo(FILE *fp, char* modelo) {
 			return NULL;
 		}
 
-		if (veiculo->removido != '0' && !strcmp(veiculo->modelo,modelo)){
+		if (veiculo->removido != '0' && veiculo->modelo != NULL 
+									&&!strcmp(veiculo->modelo,modelo)){
 			break;
 		}
 		veiculo_delete(&veiculo);
@@ -273,11 +283,37 @@ VEICULO *bin_get_veiculo_by_categoria(FILE *fp, char* categoria) {
 			return NULL;
 		}
 
-		if (veiculo->removido != '0' && !strcmp(veiculo->categoria,categoria)){
+		if (veiculo->removido != '0' && veiculo->modelo!=NULL
+								 && !strcmp(veiculo->categoria,categoria)){
 			break;
 		}
 		veiculo_delete(&veiculo);
 	}
 
 	return veiculo;
+}
+
+
+VEICULO *bin_get_veiculo(FILE *fp, char *campo, char *value) {
+	
+	if (campo == NULL || value == NULL)
+		return bin_read_veiculo(fp); 
+
+	if (strcmp(campo, "prefixo") == 0)
+		return bin_get_veiculo_by_prefixo(fp, value);
+
+	if (strcmp(campo, "data")==0)
+		return bin_get_veiculo_by_data(fp, value);
+
+	if (strcmp(campo, "quantidadeLugares")==0)
+		return bin_get_veiculo_by_quantidadeLugares(fp, atoi(value));
+
+	if (strcmp(campo, "modelo")==0)
+		return bin_get_veiculo_by_modelo(fp, value);
+
+	if (strcmp(campo, "categoria")==0)
+		return bin_get_veiculo_by_categoria(fp, value);
+
+	// se nao for nenhum campo valido, retorna a proxima linha
+
 }

@@ -53,7 +53,8 @@ void header_linha_alter_reg_removidos(FILE *fp, int nroRegRemovidos) {
 
 void escreve_linha(FILE *fp, LINHA_HEADER *header, LINHA *linha) {
 
-	fseek(fp, 1, SEEK_END);
+	if (ftell(fp) != header->byteProxReg) 
+		fseek(fp, header->byteProxReg, SEEK_SET);
 
 	fwrite(&linha->removido, sizeof(char), 1, fp);
 	fwrite(&linha->tamanhoRegistro, sizeof(int), 1, fp);
@@ -83,6 +84,7 @@ void escreve_linha(FILE *fp, LINHA_HEADER *header, LINHA *linha) {
 // escreve todo o header 
 void escreve_header_veiculo(FILE *fp, VEICULO_HEADER *header) {
 	if (ftell(fp) > 0) fseek(fp, 0, SEEK_SET);
+	
 	fwrite(&header->status, sizeof(char), 1, fp);
 	fwrite(&header->byteProxReg, sizeof(int64), 1, fp);
 	fwrite(&header->nroRegistros, sizeof(int), 1, fp);
@@ -92,9 +94,9 @@ void escreve_header_veiculo(FILE *fp, VEICULO_HEADER *header) {
 	fwrite(header->descrevePrefixo, sizeof(char), 18, fp);
 	fwrite(header->descreveData, sizeof(char), 35, fp);
 	fwrite(header->descreveLugares, sizeof(char), 42, fp);
-	fwrite(header->descreveLinha, sizeof(char), 17, fp);
-	fwrite(header->descreveModelo, sizeof(char), 20, fp);
-	fwrite(header->descreveCategoria, sizeof(char), 26, fp);
+	fwrite(header->descreveLinha, sizeof(char), 26, fp);
+	fwrite(header->descreveModelo, sizeof(char), 17, fp);
+	fwrite(header->descreveCategoria, sizeof(char), 20, fp);
 
 }
 
@@ -102,12 +104,6 @@ void escreve_header_veiculo(FILE *fp, VEICULO_HEADER *header) {
 void header_veiculo_alter_status(FILE *fp, char status) {
 	fseek(fp, 0, SEEK_SET);
 	fwrite(&status, sizeof(char), 1, fp);
-}
-
-// altera campo byteProxReg do header
-void header_veiculo_alter_byteproxreg(FILE *fp, int64 byteProxReg) {
-	fseek(fp, 1, SEEK_SET);
-	fwrite(&byteProxReg, sizeof(int64), 1, fp);
 }
 
 // altera campo byteProxReg do header
@@ -138,11 +134,11 @@ void escreve_veiculo(FILE *fp, VEICULO_HEADER *header, VEICULO *veiculo) {
 	fwrite(veiculo->prefixo, sizeof(char), 5, fp);
 	fwrite(veiculo->data, sizeof(char), 10, fp);
 	fwrite(&veiculo->quantidadeLugares, sizeof(int), 1, fp);
-	fwrite(veiculo->codLinha, sizeof(int), 1, fp);
+	fwrite(&veiculo->codLinha, sizeof(int), 1, fp);
 	fwrite(&veiculo->tamanhoModelo, sizeof(int), 1, fp);
 	fwrite(veiculo->modelo, sizeof(char), veiculo->tamanhoModelo, fp);
 	fwrite(&veiculo->tamanhoCategoria, sizeof(int), 1, fp);
-	fwrite(veiculo->modelo, sizeof(char), veiculo->tamanhoCategoria, fp);
+	fwrite(veiculo->categoria, sizeof(char), veiculo->tamanhoCategoria, fp);
 
 	header->byteProxReg = ftell(fp);
 	if (veiculo->removido == '1') {
@@ -157,4 +153,3 @@ void escreve_veiculo(FILE *fp, VEICULO_HEADER *header, VEICULO *veiculo) {
 	header_veiculo_alter_byteproxreg(fp, header->byteProxReg);
 
 }
-

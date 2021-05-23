@@ -8,7 +8,7 @@
 // preenche lixo de string com '@', a patir da posição i do '\0' até o tamanho total
 void preenche_lixo(char *str, int i, int size) {
 	if (i>=size) return ;
-
+	str[i++] = '\0';
 	for (; i<size; i++)
 		str[i] = '@';
 }
@@ -148,8 +148,12 @@ VEICULO *get_veiculo(FILE *fp){
 	preenche_lixo(vehicle->prefixo, strlen(temp)+1, 6);
 	
 	temp = strtok(NULL,",");
-	strcpy(vehicle->data,temp);
-	preenche_lixo(vehicle->data, strlen(temp)+1, 11);
+	if (strcmp(temp, "NULO")==0)
+		preenche_lixo(vehicle->data, 0, 11);
+	else {
+		strcpy(vehicle->data,temp);
+		preenche_lixo(vehicle->data, strlen(temp), 11);
+	}
 
 	temp = strtok(NULL,","); 
 	vehicle->quantidadeLugares = atoi(temp);

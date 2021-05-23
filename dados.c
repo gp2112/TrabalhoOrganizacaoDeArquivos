@@ -40,6 +40,19 @@ LINHA_HEADER *header_linha_create(FILE *fp) {
 	return header;
 }
 
+VEICULO_HEADER *header_veiculo_create(FILE *fp) {
+	VEICULO_HEADER *header = (VEICULO_HEADER *)malloc(sizeof(VEICULO_HEADER));
+
+	header->status = '0';
+	header->nroRegistros = 0;
+	header->nroRegRemovidos = 0;
+	header->byteProxReg = 174;
+
+	header_veiculo_get_descr(fp, header);
+
+	return header;
+}
+
 // AAAA-MM-DD
 void get_mes_nome(char *date, char *mes_nome) {
 	// separa os parametros da data por 0 -> AAAA\0MM\0DD
@@ -110,7 +123,7 @@ void print_linha(LINHA *linha) {
 }
 
 void print_veiculo(VEICULO *veiculo) {
-	if (strcmp(veiculo->prefixo, "NULO") == 0)
+	if (strlen(veiculo->prefixo)==0)
 		printf("Prefixo do veiculo: campo com valor nulo\n");
 	else printf("Prefixo do veiculo: %s\n", veiculo->prefixo);
 
@@ -122,11 +135,12 @@ void print_veiculo(VEICULO *veiculo) {
 		printf("Categoria do veiculo: campo com valor nulo\n");
 	else printf("Categoria do veiculo: %s\n", veiculo->categoria);
 
-	if (veiculo->data == NULL)
+	if (strlen(veiculo->data)==0)
 		printf("Data de entrada do veiculo na frota: campo com valor nulo\n");
 	else {
 		char mes_nome[11]; get_mes_nome(veiculo->data, mes_nome);
 		printf("Data de entrada do veiculo na frota: %s de %s de %s\n", veiculo->data+8, mes_nome, veiculo->data);
+		veiculo->data[4]='-'; veiculo->data[7]='-';
 	}
 
 	if (veiculo->quantidadeLugares == -1)

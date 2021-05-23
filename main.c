@@ -55,6 +55,35 @@ void binarioNaTela(char *nomeArquivoBinario) { /* Você não precisa entender o 
 	fclose(fs);
 }
 
+
+ERROR operation1(char *csv_fname, char *bin_fname) {
+	FILE *csv_f=fopen(csv_fname, "r"), *bin_f=fopen(bin_fname, "wb");
+
+	if (bin_f == NULL || csv_f == NULL) {
+		if (bin_f != NULL) fclose(bin_f);
+		if (csv_f != NULL) fclose(csv_f); 
+		return FILE_ERROR;
+	}
+
+	VEICULO *veiculo = NULL;
+
+	VEICULO_HEADER *header = header_veiculo_create(csv_f);
+
+	escreve_header_veiculo(bin_f, header);
+	while ((veiculo=get_veiculo(csv_f)) != NULL) {
+		print_veiculo(veiculo);
+		escreve_veiculo(bin_f, header, veiculo);
+		veiculo_delete(&veiculo);
+	}
+
+	header_veiculo_alter_status(bin_f, '1');
+	free(header);
+	fclose(csv_f);
+	fclose(bin_f);
+	binarioNaTela(bin_fname);
+	return 0;
+}
+
 ERROR operation2(char *csv_fname, char *bin_fname) {
 	FILE *csv_f=fopen(csv_fname, "r"), *bin_f=fopen(bin_fname, "wb");
 
@@ -81,6 +110,24 @@ ERROR operation2(char *csv_fname, char *bin_fname) {
 	return 0;
 }
 
+ERROR operation3(char *bin_fname) {
+	FILE *bin_f=fopen(bin_fname, "rb");
+
+	if (bin_f == NULL)
+		return FILE_ERROR;
+
+	VEICULO *veiculo = NULL;
+
+	while ((veiculo=bin_get_veiculo(bin_f, NULL, NULL)) != NULL) {
+		if (veiculo->removido == '1')
+			print_veiculo(veiculo);
+		veiculo_delete(&veiculo);
+	}
+
+	fclose(bin_f);
+	return 0;
+}
+
 ERROR operation4(char *bin_fname) {
 	FILE *bin_f=fopen(bin_fname, "rb");
 
@@ -99,6 +146,28 @@ ERROR operation4(char *bin_fname) {
 	return 0;
 }
 
+ERROR operation5(char *bin_fname, char *param, char *value) {
+	FILE *bin_f = fopen(bin_fname, "rb");
+
+	if (bin_f == NULL)
+		return FILE_ERROR;
+
+	VEICULO *veiculo = bin_get_veiculo(bin_f, param, value);
+	if (veiculo == NULL) {
+		fclose(bin_f);
+		return REG_NULL;
+	}
+
+	do {
+		print_veiculo(veiculo);
+		veiculo_delete(&veiculo);
+
+	} while ((veiculo=bin_get_veiculo(bin_f, param, value))!=NULL);
+
+
+	fclose(bin_f);
+	return 0;
+}
 
 ERROR operation6(char *bin_fname, char *param, char *value) {
 	FILE *bin_f = fopen(bin_fname, "rb");
@@ -120,6 +189,10 @@ ERROR operation6(char *bin_fname, char *param, char *value) {
 
 
 	fclose(bin_f);
+	return 0;
+}
+
+ERROR operation7(char *bin_fname, int n) {
 	return 0;
 }
 
@@ -201,7 +274,7 @@ ERROR operation8(char *bin_fname, int n) {
 int main(int argc, char const *argv[]) {
 	char *csv_fname, *bin_fname, *param, *value;
 	char *line = readline(stdin), *tmp=NULL;
-	int op;
+	int op, n;
 
 	ERROR erro;
 
@@ -210,6 +283,9 @@ int main(int argc, char const *argv[]) {
 
 	switch (op) {
 		case (1):
+			csv_fname = strtok(NULL, " ");
+			bin_fname = strtok(NULL, " ");
+			erro = operation1(csv_fname, bin_fname);
 			break;
 
 		case (2):
@@ -219,7 +295,8 @@ int main(int argc, char const *argv[]) {
 			break;
 
 		case (3):
-			
+			bin_fname = strtok(NULL, " ");
+			erro = operation3(bin_fname);
 			break;
 
 		case (4):
@@ -228,6 +305,11 @@ int main(int argc, char const *argv[]) {
 			break;
 
 		case (5):
+			bin_fname = strtok(NULL, " ");
+			param = strtok(NULL, " ");
+			value = strtok(NULL, " ");
+			parse_str_aspas(&value);
+			erro = operation5(bin_fname, param, value);
 			break;
 
 		case (6):
@@ -239,11 +321,14 @@ int main(int argc, char const *argv[]) {
 			break;
 
 		case (7):
+			bin_fname = strtok(NULL, " ");
+			n = atoi(strtok(NULL, " "));
+			erro = operation7(bin_fname, n);
 			break;
 
 		case (8):
 			bin_fname = strtok(NULL, " ");
-			int n = atoi(strtok(NULL, " "));
+			n = atoi(strtok(NULL, " "));
 			erro = operation8(bin_fname, n);
 			break;
 	}
