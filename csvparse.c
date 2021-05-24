@@ -2,41 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "dados.h"
+#include "util.h"
 
-#define BUFFER_SIZE 64
 
-// preenche lixo de string com '@', a patir da posição i do '\0' até o tamanho total
-void preenche_lixo(char *str, int i, int size) {
-	if (i>=size) return ;
-	str[i++] = '\0';
-	for (; i<size; i++)
-		str[i] = '@';
-}
-
-// funcao para ler um arquivo ate uma quebra de linha e armazenar em um buffer e retornar tudo log em seguida
-char *readline(FILE *in) { 
-	char *buffer = NULL;
-	char c; int i = 0;
-
-	while ((c = fgetc(in)) == '\n' || c == '\r'); // le eventuais linhas vazias antes de ler o conteudo
-	if (c == EOF) return NULL;
-		
-
-	buffer = (char *)malloc(BUFFER_SIZE * sizeof(char));
-
-	do {
-		if (i>0 && (i+1)%BUFFER_SIZE == 0)
-			buffer = (char *)realloc(buffer, BUFFER_SIZE * (int)(1 + (i+1)/BUFFER_SIZE)*sizeof(char));
-
-		buffer[i++] = c;
-
-	} while ((c = fgetc(in)) != '\n' && c != '\r' && c != EOF); 
-
-	buffer[i] = '\0';
-
-	return buffer;
-}
-
+/// Operações de leitura de CSV ///
 
 LINHA *get_linha(FILE *fp) {
 	char *line, *temp;
@@ -158,8 +127,13 @@ VEICULO *get_veiculo(FILE *fp){
 	temp = strtok(NULL,","); 
 	vehicle->quantidadeLugares = atoi(temp);
 
-	temp = strtok(NULL,","); 
-	vehicle->codLinha = atoi(temp);
+	temp = strtok(NULL,",");
+
+	if (strcmp(temp, "NULO")==0) {
+		vehicle->codLinha = -1;
+	} 
+	else
+		vehicle->codLinha = atoi(temp);
 
 
 	temp = strtok(NULL,",");

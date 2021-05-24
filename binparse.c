@@ -3,16 +3,10 @@
 #include <string.h>
 #include "dados.h"
 
-/*
-FALTA:
-
-funcoes veiculo-> ler header ok
-				  ler veiculo ok	
-				  busca de veiculo (prefixo, data, quantidadeLugares, modelo, categoria) ok
-
-*/
+/// Operações de leitura de arquivo binário ///
 
 
+// lê e retorna o header do arquivo binário de linha
 LINHA_HEADER *bin_get_header_linha(FILE *fp) {
 	LINHA_HEADER *header = (LINHA_HEADER *)malloc(sizeof(LINHA_HEADER));
 
@@ -31,6 +25,7 @@ LINHA_HEADER *bin_get_header_linha(FILE *fp) {
 	return header;
 }
 
+// lê a linha estando na posição correta
 LINHA *bin_read_linha(FILE *fp) {
 	// se o ponteiro estiver no cabeçalho, fssek para a primeira linha
 	if (ftell(fp) < 82) fseek(fp, 82, SEEK_SET);
@@ -47,18 +42,28 @@ LINHA *bin_read_linha(FILE *fp) {
 	fread(&linha->aceitaCartao, sizeof(char), 1, fp);
 
 	fread(&linha->tamanhoNome, sizeof(int), 1, fp);
-	linha->nomeLinha = (char *)calloc(linha->tamanhoNome+1, sizeof(char));
-
-	fread(linha->nomeLinha, sizeof(char), linha->tamanhoNome, fp);
+	if (linha->tamanhoNome == 0)
+		linha->nomeLinha = NULL;
+	else {
+		linha->nomeLinha = (char *)calloc(linha->tamanhoNome+1, sizeof(char));
+		fread(linha->nomeLinha, sizeof(char), linha->tamanhoNome, fp);
+	}
 
 	fread(&linha->tamanhoCor, sizeof(int), 1, fp);
-	linha->corLinha = (char *)calloc(linha->tamanhoCor+1, sizeof(char));
-
-	fread(linha->corLinha, sizeof(char), linha->tamanhoCor, fp);
+	if (linha->tamanhoCor == 0)
+		linha->corLinha = NULL;
+	else {
+		linha->corLinha = (char *)calloc(linha->tamanhoCor+1, sizeof(char));
+		fread(linha->corLinha, sizeof(char), linha->tamanhoCor, fp);
+	}
 
 	return linha;
 }
 
+/* bin_get_linha_by_X:
+ *    Busca uma linha no arquivo
+ *	  pelo parâmetro X
+*/
 LINHA *bin_get_linha_by_cod(FILE *fp, int cod) {
 
 	LINHA *linha = NULL;
@@ -125,6 +130,7 @@ LINHA *bin_get_linha_by_cor(FILE *fp, char *cor) {
 	return linha;
 }
 
+// Dado um campo, retonar a primeira linha encontrada com o valor correspondente
 LINHA *bin_get_linha(FILE *fp, char *campo, char *value) {
 	
 	if (campo == NULL || value == NULL)
@@ -162,9 +168,11 @@ VEICULO_HEADER *bin_get_header_veiculo(FILE *fp){
 	return header;
 }
 
+
+// lê o veiculo estando na posição correta
 VEICULO *bin_read_veiculo(FILE *fp) {
 	// se o ponteiro estiver no cabeçalho, fssek para a primeira linha
-	if (ftell(fp) < 174) fseek(fp, 174, SEEK_SET);
+	if (ftell(fp) < 175) fseek(fp, 175, SEEK_SET);
 
 	VEICULO *veiculo = (VEICULO *)malloc(sizeof(VEICULO));
 
@@ -195,6 +203,11 @@ VEICULO *bin_read_veiculo(FILE *fp) {
 
 	return veiculo;
 }
+
+/* bin_get_veiculo_by_X:
+ *    Busca um veiculo no arquivo
+ *	  pelo parâmetro X
+*/
 
 VEICULO *bin_get_veiculo_by_prefixo(FILE *fp, char* prefixo) {
 
@@ -293,7 +306,7 @@ VEICULO *bin_get_veiculo_by_categoria(FILE *fp, char* categoria) {
 	return veiculo;
 }
 
-
+// Dado um campo, retonar a primeira linha encontrada com o valor correspondente
 VEICULO *bin_get_veiculo(FILE *fp, char *campo, char *value) {
 	
 	// se nao for nenhum campo valido, retorna a proxima linha

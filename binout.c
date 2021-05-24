@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "dados.h"
 
+/// Operações de escrita no arquivo binário ///
+
 
 // escreve todo o header 
 void escreve_header_linha(FILE *fp, LINHA_HEADER *header) {
@@ -45,6 +47,8 @@ void header_linha_alter_reg_removidos(FILE *fp, int nroRegRemovidos) {
 
 void escreve_linha(FILE *fp, LINHA_HEADER *header, LINHA *linha) {
 
+	// se não tiver na posição do próximo registro
+	// vai para a posicao header->byteProxReg
 	if (ftell(fp) != header->byteProxReg) 
 		fseek(fp, header->byteProxReg, SEEK_SET);
 	
@@ -57,6 +61,7 @@ void escreve_linha(FILE *fp, LINHA_HEADER *header, LINHA *linha) {
 	fwrite(&linha->tamanhoCor, sizeof(int), 1, fp);
 	fwrite(linha->corLinha, sizeof(char), linha->tamanhoCor, fp);
 
+	// atribui a posição do próximo registro à posição atual
 	header->byteProxReg = ftell(fp);
 
 	if (linha->removido == '1') {
@@ -118,6 +123,8 @@ void header_veiculo_alter_reg_removidos(FILE *fp, int nroRegRemovidos) {
 
 void escreve_veiculo(FILE *fp, VEICULO_HEADER *header, VEICULO *veiculo) {
 
+	// se não tiver na posição do próximo registro
+	// vai para a posicao header->byteProxReg
 	if (ftell(fp) != header->byteProxReg) 
 		fseek(fp, header->byteProxReg, SEEK_SET);
 
@@ -132,7 +139,9 @@ void escreve_veiculo(FILE *fp, VEICULO_HEADER *header, VEICULO *veiculo) {
 	fwrite(&veiculo->tamanhoCategoria, sizeof(int), 1, fp);
 	fwrite(veiculo->categoria, sizeof(char), veiculo->tamanhoCategoria, fp);
 
+	// atribui a posição do próximo registro à posição atual
 	header->byteProxReg = ftell(fp);
+
 	if (veiculo->removido == '1') {
 		header->nroRegistros++;
 		header_veiculo_alter_regs(fp, header->nroRegistros);

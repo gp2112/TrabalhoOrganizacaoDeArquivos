@@ -4,7 +4,9 @@
 #include "dados.h"
 #include "csvparse.h"
 #include "binparse.h"
+#include "util.h"
 
+/// Funções de manipulação de LINHA e VEICULO ///
 
 // libera memória da linha //
 void linha_delete(LINHA **linha) {
@@ -46,62 +48,19 @@ VEICULO_HEADER *header_veiculo_create(FILE *fp) {
 	header->status = '0';
 	header->nroRegistros = 0;
 	header->nroRegRemovidos = 0;
-	header->byteProxReg = 174;
+	header->byteProxReg = 175;
 
 	header_veiculo_get_descr(fp, header);
 
 	return header;
 }
 
-// AAAA-MM-DD
-void get_mes_nome(char *date, char *mes_nome) {
-	// separa os parametros da data por 0 -> AAAA\0MM\0DD
-	date[4]='\0'; date[7]='\0';
-
-	int mes = atoi(date+5); 
-
-	switch (mes) {
-		case (1):
-			strcpy(mes_nome, "janeiro");
-			break;
-		case (2):
-			strcpy(mes_nome, "fevereiro");
-			break;
-		case (3):
-			strcpy(mes_nome, "marco");
-			break;
-		case (4):
-			strcpy(mes_nome, "abril");
-			break;
-		case (5):
-			strcpy(mes_nome, "maio");
-			break;
-		case (6):
-			strcpy(mes_nome, "junho");
-			break;
-		case (7):
-			strcpy(mes_nome, "julho");
-			break;
-		case (8):
-			strcpy(mes_nome, "agosto");
-			break;
-		case (9):
-			strcpy(mes_nome, "setembro");
-			break;
-		case (10):
-			strcpy(mes_nome, "outubro");
-			break;
-		case (11):
-			strcpy(mes_nome, "novembro");
-			break;
-		case (12):
-			strcpy(mes_nome, "dezembro");
-			break;
-	}
-}
-
 void print_linha(LINHA *linha) {
 	
+	if (linha->codLinha == -1)
+		printf("Codigo da linha: campo com valor nulo\n");
+	else printf("Codigo da linha: %d\n", linha->codLinha);
+
 	if (linha->nomeLinha == NULL)
 		printf("Nome da linha: campo com valor nulo\n");
 	else printf("Nome da linha: %s\n", linha->nomeLinha);
@@ -123,6 +82,7 @@ void print_linha(LINHA *linha) {
 }
 
 void print_veiculo(VEICULO *veiculo) {
+
 	if (strlen(veiculo->prefixo)==0)
 		printf("Prefixo do veiculo: campo com valor nulo\n");
 	else printf("Prefixo do veiculo: %s\n", veiculo->prefixo);
@@ -144,8 +104,8 @@ void print_veiculo(VEICULO *veiculo) {
 	}
 
 	if (veiculo->quantidadeLugares == -1)
-		printf("Quantidade de lugares sentados disponíveis: campo com valor nulo\n");
-	else printf("Quantidade de lugares sentados disponíveis: %d\n", veiculo->quantidadeLugares);
+		printf("Quantidade de lugares sentados disponiveis: campo com valor nulo\n");
+	else printf("Quantidade de lugares sentados disponiveis: %d\n", veiculo->quantidadeLugares);
 
 	printf("\n");
 }
