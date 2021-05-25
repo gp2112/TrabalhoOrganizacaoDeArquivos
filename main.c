@@ -12,9 +12,11 @@
 
 
 int main(int argc, char const *argv[]) {
-	char csv_fname[20], bin_fname[20];
-	
-	int op; // codigo da operacao 
+	char csv_fname[20], bin_fname[20],
+			param[15], value[100];
+
+
+	int op, n; // codigo da operacao 
 	scanf("%d", &op);
 
 
@@ -44,30 +46,26 @@ int main(int argc, char const *argv[]) {
 			break;
 
 		case (5):
-			scanf("%s", bin_fname);
-			char param[15]; scanf("%s", param);
-			char value[100];
+			scanf("%s %s", bin_fname, param);
 			scan_quote_string(value);
 			erro = operation5(bin_fname, param, value);
 			break;
 
 		case (6):
-			scanf("%s", bin_fname);
-			char param[15]; scanf("%s", param);
-			char value[100];
+			scanf("%s %s", bin_fname, param);
 			scan_quote_string(value);
 			erro = operation6(bin_fname, param, value);
 			break;
 
 		case (7):
 			scanf("%s", bin_fname);
-			int n; scanf("%d", &n);
+			scanf("%d", &n);
 			erro = operation7(bin_fname, n);
 			break;
 
 		case (8):
 			scanf("%s", bin_fname);
-			int n; scanf("%d", &n);
+			scanf("%d", &n);
 			erro = operation8(bin_fname, n);
 			break;
 	}

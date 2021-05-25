@@ -186,13 +186,13 @@ ERROR operation7(char *bin_fname, int n) {
 	if (bin_f == NULL)
 		return FILE_ERROR;
 
-	char *line, *temp;
-
 	VEICULO_HEADER *header = bin_get_header_veiculo(bin_f);
 	if (header->status == '0') {
 		fclose(bin_f); free(header);
 		return FILE_ERROR;
 	}
+
+	char temp[100];
 
 	header->status = '0';
 	header_linha_alter_status(bin_f, '0');
@@ -202,57 +202,42 @@ ERROR operation7(char *bin_fname, int n) {
 	for (int i=0; i<n; i++) {
 		veiculo = (VEICULO *)malloc(sizeof(VEICULO));
 
-		line = readline(stdin);
-		temp = strtok(line, " ");
-		if (strcmp(temp, "NULO")==0)
+		
+		scan_quote_string(veiculo->prefixo);
+		if (strcmp(veiculo->prefixo, "NULO")==0)
 			preenche_lixo(veiculo->prefixo, 0, 5);
-		else {
-			parse_str_aspas(&temp);
-			strcpy(veiculo->prefixo, temp);
+		else
 			preenche_lixo(veiculo->prefixo, strlen(veiculo->prefixo), 5);
-		}
+		
 
-		temp = strtok(NULL, " ");
-		if (strcmp(temp, "NULO")==0)
-			preenche_lixo(veiculo->data, 0, 5);
-		else {
-			parse_str_aspas(&temp);
-			strcpy(veiculo->data, temp);
-			preenche_lixo(veiculo->data, strlen(veiculo->data), 5);
-		}
-		temp = strtok(NULL, " ");
-		if (strcmp(temp, "NULO")==0)
-			veiculo->quantidadeLugares=-1;
+		scan_quote_string(veiculo->data);
+		if (strcmp(veiculo->data, "NULO")==0)
+			preenche_lixo(veiculo->data, 0, 11);
 		else
-			veiculo->quantidadeLugares = atoi(temp);
+			preenche_lixo(veiculo->data, strlen(veiculo->data), 11);
 
-		temp = strtok(NULL, " ");
+		scanf("%d %d", &veiculo->quantidadeLugares, &veiculo->codLinha);
 
-		if (strcmp(temp, "NULO")==0)
-			veiculo->codLinha=-1;
-		else
-			veiculo->codLinha = atoi(temp);
-
-		temp = strtok(NULL, " ");
-		if (strcmp(temp, "NULO")==0)
+		scan_quote_string(temp);
+		if (strcmp(temp, "NULO")==0) {
+			veiculo->tamanhoModelo = 0;
 			veiculo->modelo = NULL;
+		}
 		else {
-			char *aux = temp;
-			temp = parse_str_aspas(&aux);
-			veiculo->tamanhoModelo = strlen(aux);
+			veiculo->tamanhoModelo = strlen(temp);
 			veiculo->modelo = (char *)calloc(veiculo->tamanhoModelo+1, sizeof(char));
-			strcpy(veiculo->modelo, aux);
+			strcpy(veiculo->modelo, temp);
 		}
 
-		temp = strtok(NULL, " ");
-		if (strcmp(temp, "NULO")==0)
+		scan_quote_string(temp);
+		if (strcmp(temp, "NULO")==0) {
+			veiculo->tamanhoCategoria = 0;
 			veiculo->categoria = NULL;
+		}
 		else {
-			char *aux = temp;
-			temp = parse_str_aspas(&aux);
-			veiculo->tamanhoCategoria = strlen(aux);
+			veiculo->tamanhoCategoria = strlen(temp);
 			veiculo->categoria = (char *)calloc(veiculo->tamanhoCategoria+1, sizeof(char));
-			strcpy(veiculo->categoria, aux);
+			strcpy(veiculo->categoria, temp);
 		}
 
 		veiculo->tamanhoRegistro = 31 + veiculo->tamanhoCategoria + veiculo->tamanhoModelo;
@@ -260,7 +245,6 @@ ERROR operation7(char *bin_fname, int n) {
 
 		escreve_veiculo(bin_f, header, veiculo);
 		veiculo_delete(&veiculo);
-		free(line);
 	}
 
 	header_veiculo_alter_status(bin_f, '1');
@@ -278,7 +262,7 @@ ERROR operation8(char *bin_fname, int n) {
 	if (bin_f == NULL)
 		return FILE_ERROR;
 
-	char *line, *temp;
+	char temp[100];
 
 	// se o status do arquivo for 0, retorna erro
 	LINHA_HEADER *header = bin_get_header_linha(bin_f);
@@ -297,39 +281,28 @@ ERROR operation8(char *bin_fname, int n) {
 	for (int i=0; i<n; i++) {
 
 		linha = (LINHA *)malloc(sizeof(LINHA));
-
-		line = readline(stdin);
 		
-		temp = strtok(line, " ");
-		if (strcmp(temp, "NULO") == 0)
-			linha->codLinha = -1;
+		scanf("%d", &linha->codLinha);
 
-		else linha->codLinha = atoi(temp);
+		scan_quote_string(&linha->aceitaCartao);
 
-		temp = strtok(NULL, " ");
-
-		linha->aceitaCartao = temp[1];
-
-		temp = strtok(NULL, " ");
-
+		scan_quote_string(temp);
 		if (strcmp(temp, "NULO") == 0) {
 			linha->nomeLinha = NULL;
 			linha->tamanhoNome = 0;
 		
 		} else {
-			char *aux = temp;
-			temp = parse_str_aspas(&aux);
-			linha->tamanhoNome = strlen(aux);
+			linha->tamanhoNome = strlen(temp);
 			linha->nomeLinha = (char*)calloc(linha->tamanhoNome+1, sizeof(char));
-			strcpy(linha->nomeLinha, aux);
+			strcpy(linha->nomeLinha, temp);
 		}
 
+		scan_quote_string(temp);
 		if (strcmp(temp, "NULO") == 0) {
 			linha->corLinha = NULL;
 			linha->tamanhoCor = 0;
 		}
 		else {
-			parse_str_aspas(&temp);
 			linha->tamanhoCor = strlen(temp);
 			linha->corLinha = (char*)calloc(linha->tamanhoCor+1, sizeof(char));
 			strcpy(linha->corLinha, temp);
@@ -339,7 +312,6 @@ ERROR operation8(char *bin_fname, int n) {
 		
 		escreve_linha(bin_f, header, linha);
 		linha_delete(&linha);
-		free(line);
 	}
 
 	header->status = '1';

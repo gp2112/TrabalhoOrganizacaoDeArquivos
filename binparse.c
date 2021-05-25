@@ -105,7 +105,8 @@ LINHA *bin_get_linha_by_nome(FILE *fp, char *nomeLinha) {
 	while (1) {
 		linha = bin_read_linha(fp);
 		if (linha == NULL) return NULL;
-		if (linha->removido != '0' && strcmp(linha->nomeLinha, nomeLinha)==0)
+
+		if (linha->removido != '0' && linha->nomeLinha!=NULL && strcmp(linha->nomeLinha, nomeLinha)==0)
 			break;
 		linha_delete(&linha);
 
@@ -121,7 +122,7 @@ LINHA *bin_get_linha_by_cor(FILE *fp, char *cor) {
 		linha = bin_read_linha(fp);
 		if (linha == NULL) return NULL;
 		
-		if (linha->removido != '0' && strcmp(linha->corLinha, cor)==0)
+		if (linha->removido != '0' && linha->corLinha!=NULL && strcmp(linha->corLinha, cor)==0)
 			break;
 		linha_delete(&linha);
 
@@ -132,7 +133,6 @@ LINHA *bin_get_linha_by_cor(FILE *fp, char *cor) {
 
 // Dado um campo, retonar a primeira linha encontrada com o valor correspondente
 LINHA *bin_get_linha(FILE *fp, char *campo, char *value) {
-	
 	if (campo == NULL || value == NULL)
 		return bin_read_linha(fp); 
 
