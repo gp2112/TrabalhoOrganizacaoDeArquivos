@@ -20,8 +20,10 @@ void linha_delete(LINHA **linha) {
 
 // libera memória do veiculo//
 void veiculo_delete(VEICULO **veiculo) {
-	free((*veiculo)->modelo);
-	free((*veiculo)->categoria);
+	if ((*veiculo)->modelo != NULL)
+		free((*veiculo)->modelo);
+	if ((*veiculo)->categoria)
+		free((*veiculo)->categoria);
 	free(*veiculo);
 	*veiculo = NULL;
 }
