@@ -5,6 +5,28 @@
 #define int64 long long int
 #endif
 
+#ifndef ORDEM
+#define ORDEM 5
+#endif
+
+typedef struct {
+	char folha;
+	int nroChavesIndexadas;
+	int RRNdoNo;
+	int ps[ORDEM-1];
+	int cs[ORDEM-1];
+	int64 prs[ORDEM];
+
+} DATA_REG;
+
+typedef struct {
+	char status;
+	int noRaiz;
+	int RRNproxNo;
+
+} INDEX_HEADER;
+
+
 typedef struct {
 
 	char status; 

@@ -4,6 +4,13 @@
 
 /// Operações de escrita no arquivo binário ///
 
+void escreve_header_index(FILE *fp, INDEX_HEADER *header) {
+	if (ftell(fp) > 0) fseek(fp, 0, SEEK_SET);
+	fwrite(&header->status, sizeof(char), 1, fp);
+	fwrite(&header->noRaiz, sizeof(int), 1, fp);
+	fwrite(&header->RRNproxNo, sizeof(int), 1, fp);
+}
+
 
 // escreve todo o header 
 void escreve_header_linha(FILE *fp, LINHA_HEADER *header) {
