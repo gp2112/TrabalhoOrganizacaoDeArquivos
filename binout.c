@@ -9,8 +9,28 @@ void escreve_header_index(FILE *fp, INDEX_HEADER *header) {
 	fwrite(&header->status, sizeof(char), 1, fp);
 	fwrite(&header->noRaiz, sizeof(int), 1, fp);
 	fwrite(&header->RRNproxNo, sizeof(int), 1, fp);
+	char lixo[68];
+	for (int i=0; i<68; i++) lixo[i]='@';
+
+	fwrite(lixo, sizeof(char), 68, fp);
+
 }
 
+void escreve_index_data(FILE *fp, INDEX_REG *data) {
+	// vai pra segunda página caso esteja na primeira (header)
+	if (ftell(fp) < 77) fseek(fp, 77, SEEK_SET);
+
+	fwrite(&data->folha, sizeof(char), 1, fp);
+	fwrite(&data->nroChavesIndexadas, sizeof(int), 1, fp);
+	fwrite(&data->RRNdoNo, sizeof(char), 1, fp);
+	for (int i=0; i<ORDEM; i++) {
+		fwrite(&data->ps[i], sizeof(int), 1, fp);
+		fwrite(&data->cs[i], sizeof(int), 1, fp);
+		fwrite(&data->prs[i], sizeof(int64), 1, fp);
+	}
+	fwrite(&data->ps[ORDEM-1], sizeof(int), 1, fp);
+
+}
 
 // escreve todo o header 
 void escreve_header_linha(FILE *fp, LINHA_HEADER *header) {

@@ -13,11 +13,11 @@ typedef struct {
 	char folha;
 	int nroChavesIndexadas;
 	int RRNdoNo;
-	int ps[ORDEM-1];
-	int cs[ORDEM-1];
-	int64 prs[ORDEM];
+	int ps[ORDEM];
+	int cs[ORDEM-1]; // ordenado !
+	int64 prs[ORDEM-1];
 
-} DATA_REG;
+} INDEX_REG;
 
 typedef struct {
 	char status;
