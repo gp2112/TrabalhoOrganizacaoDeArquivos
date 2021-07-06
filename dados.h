@@ -87,6 +87,8 @@ void linha_delete(LINHA **linha);
 
 void veiculo_delete(VEICULO **veiculo);
 
+INDEX_HEADER *header_index_create();
+
 LINHA_HEADER *header_linha_create(FILE *fp);
 
 VEICULO_HEADER *header_veiculo_create(FILE *fp);
