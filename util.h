@@ -1,6 +1,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#define RRN(p, psize) (int)(p/psize)
+
 int convertePrefixo(char* str);
 void binarioNaTela(char *nomeArquivoBinario);
 void scan_quote_string(char *str);

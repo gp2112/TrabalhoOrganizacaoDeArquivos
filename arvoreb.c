@@ -3,37 +3,27 @@
 #include "arvoreb.h"
 
 
-
-typedef struct node_ NODE;
-
-
-struct node_ {
+struct btree_ {
 	int size; // uso do nó max=ordem-1
 	int rrn;
 	int keys[ORDEM-1];
-	NODE *children[ORDEM];
-};
-
-struct btree_ {
-	NODE *root;
+	int64 pos[ORDEM-1]; //respectivas posições das chaves
+	BTREE *children[ORDEM];
 };
 
 
-NODE *node_create() {
-	NODE *node = (NODE *)malloc(sizeof(NODE));
-	if (node != NULL) {
-		node->rrn = -1;
-		node->size = 0;
-		for (int i=0; i<ORDEM; i++)
-			node->children[i] = NULL;
-	}
-	return node;
-}
 
-BTREE *btree_create() {
+BTREE *btree_create(int rrn) {
 	BTREE *btree = (BTREE *)malloc(sizeof(BTREE));
-	if (btree != NULL)
-		btree->root = node_create();
+	if (btree != NULL) {
+		btree->rrn = rrn;
+		for (int i=0; i<ORDEM-1; i++) {
+			btree->keys[i] = -1;
+			btree->pos[i] = -1;
+			btree->children[i] = NULL;
+		}
+		btree->children[ORDEM-1] = NULL;
+	}
 	
 	return btree;
 }
@@ -53,38 +43,65 @@ int binary_search(int *list, int key, int start, int end) {
 		return binary_search(list, key, i, end);
 }
 
-int node_search(NODE *root, int key) {
+int btree_recursive_search(BTREE *root, int key) {
 	if (root == NULL) return -1;
 
 	int index = binary_search(root->keys, key, 0, root->size);
 	if (root->keys[index] == key)
-		return root->rrm;
+		return root->rrn;
 
 	// se o índice retornado na BB não corresponde ao índice da chave
 	// ela não existe. Assim é feita a busca na árvore filha
-	return node_search(root->children[index], key);
+	return btree_recursive_search(root->children[index], key);
 
 	// se não tiver chave maior na página, vai pro último filho
-	return node_search(root->children[ORDEM-1], key);
+	return btree_recursive_search(root->children[ORDEM-1], key);
 }
 
 int btree_search(BTREE *btree, int key) {
 	if (btree == NULL)
 		return -1;
 
-	return node_search(btree->root, key);
+	return btree_recursive_search(btree, key);
 }
 
 
 
 
-void split12(NODE *root) {
-	NODE *node = node_create();
-	node->rrn = root->rrn;
+void split12(BTREE *root) {
+	BTREE *subtree = btree_create();
+	subtree->rrn = root->rrn;
 
 }
 
-void node_insert_recursive(NODE *root, int key) {
+
+// salva/atualiza o nó no arquivo de índice
+void save_node(FILE *f, BTREE *btree) {
+	fseek(f, 77*btree->rrn, SEEK_SET);
+
+	INDEX_REG *index_reg = NULL;
+
+	index_reg = bin_get_index_reg(f);
+
+	// se já existe no arquivo
+	if (index_reg == NULL) 
+		index_reg = create_indexreg();
+
+	for (int i=0; i<ORDEM-1; i++) {
+		index_reg->cs[i] = btree->keys[i];
+		index_reg->prs[i] = btree->pos[i];
+		index_reg->ps[i] = btree->children[i]==NULL ? -1 : btree->children[i]->rrn;
+	}
+	index_reg->ps[ORDEM-1] = btree->children[ORDEM-1]==NULL ? -1 : btree->children[ORDEM-1]->rrn;
+
+	index_reg->folha = btree->size==0 ? '1' : '0';
+	index_reg->nroChavesIndexadas = btree->size;
+	index_reg->RRNdoNo = btree->rrn;
+
+	escreve_index_data(f, index_reg);
+}
+
+void node_insert_recursive(FILE *f, BTREE *root, int key) {
 	if (root == NULL) return ;
 
 
@@ -100,25 +117,18 @@ void node_insert_recursive(NODE *root, int key) {
 	}
 }
 
-void btree_insert(BTREE *btree, int key) {
+void btree_insert(FILE *f, BTREE *btree, int key, int pos) {
 
 
 
 }
 
-
-void delete_nodes(NODE **root) {
-	if (*root==NULL) return;
-	for (int i=0; i<ORDEM; i++)
-		delete_nodes(&((*root)->children[i]));
-	free(*root);
-	*root = NULL;
-}
 
 void btree_delete(BTREE **btree) {
-	if (*btree == NULL) return ;
-	delete_nodes(&(*btree)->root);
-	free(*btree);
-	*btree = NULL;
+	if (*root==NULL) return;
+	for (int i=0; i<ORDEM; i++)
+		recursive_delete(&((*root)->children[i]));
+	free(*root);
+	*root = NULL;
 }
 

@@ -123,3 +123,36 @@ void print_veiculo(VEICULO *veiculo) {
 
 	printf("\n");
 }
+
+/*
+
+typedef struct {
+	char folha;
+	int nroChavesIndexadas;
+	int RRNdoNo;
+	int ps[ORDEM];
+	int cs[ORDEM-1]; // ordenado !
+	int64 prs[ORDEM-1];
+
+} INDEX_REG;
+
+*/
+
+INDEX_REG *create_indexreg() {
+	if (btree == NULL) return NULL;
+
+	INDEX_REG *index_reg = (INDEX_REG *)malloc(sizeof(INDEX_REG));
+	if (index_reg == NULL)
+		return NULL;
+
+
+	for (int i=0; i<ORDEM-1; i++) {
+		index_reg->cs[i] = -1;
+		index_reg->ps[i] = -1;
+		index_reg->prs[i] = -1;
+	}
+	index_reg->ps[i] = btree->children[i]==NULL ? -1 : btree->children[i]->rrn;
+
+
+	return index_reg;
+}
