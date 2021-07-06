@@ -30,6 +30,18 @@ void veiculo_delete(VEICULO **veiculo) {
 ///////////////////////////////////
 
 
+INDEX_HEADER *header_index_create() {
+	INDEX_HEADER *index = (INDEX_HEADER *)malloc(sizeof(INDEX_HEADER));
+
+	if (index != NULL) {
+		index->status = '0';
+		index->noRaiz = -1;
+		index->RRNproxNo = 77;
+	}
+
+	return index;
+}
+
 // inicia um header de linha om valores iniciais
 LINHA_HEADER *header_linha_create(FILE *fp) {
 	LINHA_HEADER *header = (LINHA_HEADER *)malloc(sizeof(LINHA_HEADER));
