@@ -326,27 +326,71 @@ ERROR operation8(char *bin_fname, int n) {
 	return 0;
 }
 
+
 ERROR operation9(char *bin_fname, char *bin_index) {
 	FILE *bin_data = fopen(bin_fname, "rb"), *index_f = fopen(bin_index, "wb");
+
+	if (bin_data==NULL || index_f == NULl)
+		return FILE_ERROR;
 
 	// cria arquivo de índice e escreve header
 	INDEX_HEADER *index_header = header_index_create();
 	escreve_header_index(index_f, index_header);
 
 
-	BTREE *btree_create();
+	BTREE *btree = btree_create();
 	
 	VEICULO_HEADER *header_veiculo = bin_get_header_veiculo(bin_data);
 
-	VEICULO *veiculo = NULL;
+	VEICULO *veiculo = NULL; 
+	INDEX_REG *index_reg = NULL;
 
 	for (int i=0; i<header_veiculo->nroRegRemovidos; i++) {
 		veiculo = bin_get_veiculo(bin_fname, NULL, NULL); //pega o proximo veiculo
-
 		
+		if (veiculo->removido == '1')
+			btree_insert(btree, convertePrefixo(veiculo->prefixo), ftell(bin_data)-veiculo->tamanhoRegistro);
 
-		btree_insert()
+		veiculo_delete(&veiculo);
 
 	}
 
+	btree_delete(&btree);
+	fclose(bin_data);
+	fclose(index_f);
+	return 0;
+}
+
+ERROR operation10(char *bin_fname, char *bin_index) {
+	FILE *bin_data = fopen(bin_fname, "rb"), *index_f = fopen(bin_index, "wb");
+
+	if (bin_data==NULL || index_f == NULl)
+		return FILE_ERROR;
+
+	// cria arquivo de índice e escreve header
+	INDEX_HEADER *index_header = header_index_create();
+	escreve_header_index(index_f, index_header);
+
+
+	BTREE *btree = btree_create();
+	
+	LINHA_HEADER *header_linha = bin_get_header_linha(bin_data);
+
+	LINHA *linha = NULL;
+	INDEX_REG *index_reg = NULL;
+
+	for (int i=0; i<header_linha->nroRegRemovidos; i++) {
+		linha = bin_get_linha(bin_fname, NULL, NULL); //pega a proxima linha
+		
+		if (linha->removido == '1')
+			btree_insert(btree, linha->codLinha, ftell(bin_data)-linha->tamanhoRegistro);
+
+		linha_delete(&linha);
+
+	}
+
+	btree_delete(&btree);
+	fclose(bin_data);
+	fclose(index_f);
+	return 0;
 }

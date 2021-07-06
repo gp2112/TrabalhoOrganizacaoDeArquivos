@@ -21,7 +21,9 @@ INDEX_REG *bin_get_index_reg(FILE *fp) {
 	INDEX_REG *reg = (INDEX_REG *)malloc(sizeof(INDEX_REG));
 	if (ftell(fp) < 77) fseek(fp, 77, SEEK_SET);
 
-	fread(&reg->folha, sizeof(char), 1, fp);
+	if (fread(&reg->folha, sizeof(char), 1, fp) != 1)
+		return NULL;
+
 	fread(&reg->nroChavesIndexadas, sizeof(int), 1, fp);
 	fread(&reg->RRNdoNo, sizeof(int), 1, fp);
 	for (int i=0; i<ORDEM; i++) {
