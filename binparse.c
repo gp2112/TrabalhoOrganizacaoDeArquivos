@@ -5,6 +5,35 @@
 
 /// Operações de leitura de arquivo binário ///
 
+INDEX_HEADER *bin_get_header_index(FILE *fp) {
+	INDEX_HEADER *header = (INDEX_HEADER *)malloc(sizeof(INDEX_HEADER));
+	if (ftell(fp) > 0) fseek(fp, 0, SEEK_SET);
+
+	fread(&header->status, sizeof(char), 1, fp);
+	fread(&header->noRaiz, sizeof(int), 1, fp);
+	fread(&header->RRNproxNo, sizeof(int), 1, fp);
+
+	return header;
+}
+
+
+INDEX_REG *bin_get_index_reg(FILE *fp) {
+	INDEX_REG *reg = (INDEX_REG *)malloc(sizeof(INDEX_REG));
+	if (ftell(fp) < 77) fseek(fp, 77, SEEK_SET);
+
+	fread(&reg->folha, sizeof(char), 1, fp);
+	fread(&reg->nroChavesIndexadas, sizeof(int), 1, fp);
+	fread(&reg->RRNdoNo, sizeof(int), 1, fp);
+	for (int i=0; i<ORDEM; i++) {
+		fread(&reg->ps[i], sizeof(int), 1, fp);
+		fread(&reg->cs[i], sizeof(int), 1, fp);
+		fread(&reg->prs[i], sizeof(int64), 1, fp);
+	}
+	fread(&reg->ps[ORDEM-1], sizeof(int), 1, fp);
+
+	return reg;
+}
+
 
 // lê e retorna o header do arquivo binário de linha
 LINHA_HEADER *bin_get_header_linha(FILE *fp) {
