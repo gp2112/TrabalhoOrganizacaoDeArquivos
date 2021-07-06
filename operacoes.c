@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "arvoreb.h"
 #include "operacoes.h"
 #include "util.h"
 
@@ -323,4 +324,22 @@ ERROR operation8(char *bin_fname, int n) {
 	binarioNaTela(bin_fname);
 
 	return 0;
+}
+
+ERROR operation9(char *bin_fname, char *bin_index) {
+	BTREE *btree_create();
+	FILE *bin_data = fopen(bin_fname, "rb");
+	VEICULO_HEADER *header_veiculo = bin_get_header_veiculo(bin_data);
+
+	VEICULO *veiculo = NULL;
+
+	for (int i=0; i<header_veiculo->nroRegRemovidos; i++) {
+		veiculo = bin_get_veiculo(FILE *fp, char *campo, char *value);
+
+
+		btree_insert()
+
+
+	}
+
 }

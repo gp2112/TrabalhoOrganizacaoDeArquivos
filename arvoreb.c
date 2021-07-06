@@ -9,7 +9,7 @@ typedef struct node_ NODE;
 
 struct node_ {
 	int size; // uso do nó max=ordem-1
-	int rrm;
+	int rrn;
 	int keys[ORDEM-1];
 	NODE *children[ORDEM];
 };
@@ -22,7 +22,7 @@ struct btree_ {
 NODE *node_create() {
 	NODE *node = (NODE *)malloc(sizeof(NODE));
 	if (node != NULL) {
-		node->rrm = -1;
+		node->rrn = -1;
 		node->size = 0;
 		for (int i=0; i<ORDEM; i++)
 			node->children[i] = NULL;
@@ -80,7 +80,7 @@ int btree_search(BTREE *btree, int key) {
 
 void split12(NODE *root) {
 	NODE *node = node_create();
-	node->rrm = root->rrm;
+	node->rrn = root->rrn;
 
 }
 
@@ -99,12 +99,12 @@ void node_insert_recursive(NODE *root, int key) {
 
 	}
 }
-/*
+
 void btree_insert(BTREE *btree, int key) {
 
 
 
-}*/
+}
 
 
 void delete_nodes(NODE **root) {
