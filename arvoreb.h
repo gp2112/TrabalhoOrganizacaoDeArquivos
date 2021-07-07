@@ -3,6 +3,7 @@
 
 typedef struct btree_ BTREE;
 
+#include "dados.h"
 
 #ifndef ORDEM
 	#define ORDEM 5

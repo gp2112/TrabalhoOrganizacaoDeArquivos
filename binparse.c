@@ -17,9 +17,10 @@ INDEX_HEADER *bin_get_header_index(FILE *fp) {
 }
 
 
-INDEX_REG *bin_get_index_reg(FILE *fp) {
+INDEX_REG *bin_get_index_reg(FILE *fp, int rrn) {
 	INDEX_REG *reg = (INDEX_REG *)malloc(sizeof(INDEX_REG));
-	if (ftell(fp) < 77) fseek(fp, 77, SEEK_SET);
+	
+	fseek(fp, 77*rrn, SEEK_SET);
 
 	if (fread(&reg->folha, sizeof(char), 1, fp) != 1)
 		return NULL;
