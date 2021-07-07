@@ -29,19 +29,6 @@ void veiculo_delete(VEICULO **veiculo) {
 }
 ///////////////////////////////////
 
-
-INDEX_HEADER *header_index_create() {
-	INDEX_HEADER *index = (INDEX_HEADER *)malloc(sizeof(INDEX_HEADER));
-
-	if (index != NULL) {
-		index->status = '0';
-		index->noRaiz = -1;
-		index->RRNproxNo = 77;
-	}
-
-	return index;
-}
-
 // inicia um header de linha om valores iniciais
 LINHA_HEADER *header_linha_create(FILE *fp) {
 	LINHA_HEADER *header = (LINHA_HEADER *)malloc(sizeof(LINHA_HEADER));
@@ -138,21 +125,3 @@ typedef struct {
 
 */
 
-INDEX_REG *create_indexreg() {
-	if (btree == NULL) return NULL;
-
-	INDEX_REG *index_reg = (INDEX_REG *)malloc(sizeof(INDEX_REG));
-	if (index_reg == NULL)
-		return NULL;
-
-
-	for (int i=0; i<ORDEM-1; i++) {
-		index_reg->cs[i] = -1;
-		index_reg->ps[i] = -1;
-		index_reg->prs[i] = -1;
-	}
-	index_reg->ps[i] = btree->children[i]==NULL ? -1 : btree->children[i]->rrn;
-
-
-	return index_reg;
-}

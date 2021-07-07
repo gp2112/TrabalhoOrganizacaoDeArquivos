@@ -18,7 +18,7 @@ void escreve_header_index(FILE *fp, INDEX_HEADER *header) {
 
 void escreve_index_data(FILE *fp, INDEX_REG *data) {
 	// vai pra segunda página caso esteja na primeira (header)
-	if (ftell(fp) < 77) fseek(fp, 77, SEEK_SET);
+	fseek(fp, 77*data->RRNdoNo, SEEK_SET);
 
 	fwrite(&data->folha, sizeof(char), 1, fp);
 	fwrite(&data->nroChavesIndexadas, sizeof(int), 1, fp);

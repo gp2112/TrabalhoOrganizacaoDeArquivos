@@ -13,9 +13,9 @@ typedef struct {
 	char folha;
 	int nroChavesIndexadas;
 	int RRNdoNo;
-	int ps[ORDEM];
-	int cs[ORDEM-1]; // ordenado !
-	int64 prs[ORDEM-1];
+	int children[ORDEM];
+	int keys[ORDEM-1]; // ordenado !
+	int64 pos[ORDEM-1];
 
 } INDEX_REG;
 
