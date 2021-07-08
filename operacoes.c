@@ -337,25 +337,42 @@ ERROR operation9(char *bin_fname, char *bin_index) {
 	INDEX_HEADER *index_header = header_index_create();
 	escreve_header_index(index_f, index_header);
 
-
-	BTREE *btree = btree_create();
 	
 	VEICULO_HEADER *header_veiculo = bin_get_header_veiculo(bin_data);
 
 	VEICULO *veiculo = NULL; 
-	INDEX_REG *index_reg = NULL;
+
+	// cria raiz
+	INDEX_REG *root = create_indexreg(1);
+	escreve_index_data(bin_index, root);
+	free(root); root=NULL;
+	////////////////////
+
+	// parametros para funcão de inserção (não precisam estar com valores atribuidos)
+	int promo_key, promo_child, promo_pos, insert_return=-1;
 
 	for (int i=0; i<header_veiculo->nroRegRemovidos; i++) {
 		veiculo = bin_get_veiculo(bin_fname, NULL, NULL); //pega o proximo veiculo
-		
+
 		if (veiculo->removido == '1')
-			btree_insert(btree, convertePrefixo(veiculo->prefixo), ftell(bin_data)-veiculo->tamanhoRegistro);
+			insert_return = btree_insert(index_f, index_header, convertePrefixo(veiculo->prefixo), ftell(bin_data)-veiculo->tamanhoRegistro, &promo_child, &promo_pos, &promo_key);
+
+		if (insert_return == PROMOTION) {
+			INDEX_REG *new_root = create_indexreg(header->RRNproxNo);
+			new_root->keys[0] = promo_key;
+			new_root->children[0] = root->RRNdoNo;
+			new_root->children[1] = promo_child;
+			index_header->noRaiz = new_root->RRNdoNo;
+			index_header->RRNproxNo++;
+			free(new_root);
+		}
 
 		veiculo_delete(&veiculo);
 
 	}
-
-	btree_delete(&btree);
+	index_header->status = '1';
+	escreve_header_index(index_header);
+	free(root);
 	fclose(bin_data);
 	fclose(index_f);
 	return 0;
