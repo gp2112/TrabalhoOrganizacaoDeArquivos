@@ -6,12 +6,12 @@ GERA ARQUIVO BINÁRIO DAS STRUCTS
 DE CARRO E PEDESTRE
 */
 
-void escreve_header_index(char *f, INDEX_HEADER *h);
+int escreve_header_index(char *f, INDEX_HEADER *h);
 
 void escreve_header_veiculo(FILE *fp, VEICULO_HEADER *hv);
 void escreve_header_linha(FILE *fp, LINHA_HEADER *hl);
 
-void escreve_index_data(char *f, INDEX_REG *data);
+int escreve_index_data(char *f, INDEX_REG *data);
 
 // Indentificar campos nulos como "NULO" //
 void escreve_veiculo(FILE *fp, VEICULO_HEADER *h, VEICULO *v);

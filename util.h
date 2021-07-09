@@ -3,7 +3,7 @@
 
 #define RRN(p, psize) (int)(p/psize)
 
-int convertePrefixo(char* str);
+int convertePrefixo(const char* str);
 void binarioNaTela(char *nomeArquivoBinario);
 void scan_quote_string(char *str);
 char *readline(FILE *in);

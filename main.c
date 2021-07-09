@@ -75,12 +75,22 @@ int main(int argc, char const *argv[]) {
 			erro = operation9(bin_fname, index_name);
 			break;
 
+		case (10):
+			scanf("%s", bin_fname);
+			scanf("%s", index_name);
+			erro = operation10(bin_fname, index_name);
+			break;
+
 		case (11):
 			scanf("%s", bin_fname);
 			scanf("%s", index_name);
 			scanf("%s", param);
 			scan_quote_string(value);
 			erro = operation11(bin_fname, index_name, value);
+			break;
+		case (-1):
+			scanf("%s", bin_fname);
+			erro = op22(bin_fname);
 			break;
 	}
 
