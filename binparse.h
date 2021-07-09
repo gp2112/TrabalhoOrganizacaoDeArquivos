@@ -5,7 +5,7 @@
 
 INDEX_HEADER *bin_get_header_index(FILE *fp);
 
-INDEX_REG *bin_get_index_reg(FILE *fp);
+INDEX_REG *bin_get_index_reg(FILE *fp, int rrn);
 
 VEICULO_HEADER *bin_get_header_veiculo(FILE *fp);
 

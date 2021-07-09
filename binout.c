@@ -22,13 +22,13 @@ void escreve_index_data(FILE *fp, INDEX_REG *data) {
 
 	fwrite(&data->folha, sizeof(char), 1, fp);
 	fwrite(&data->nroChavesIndexadas, sizeof(int), 1, fp);
-	fwrite(&data->RRNdoNo, sizeof(char), 1, fp);
-	for (int i=0; i<ORDEM; i++) {
-		fwrite(&data->ps[i], sizeof(int), 1, fp);
-		fwrite(&data->cs[i], sizeof(int), 1, fp);
-		fwrite(&data->prs[i], sizeof(int64), 1, fp);
+	fwrite(&data->RRNdoNo, sizeof(int), 1, fp);
+	for (int i=0; i<ORDEM-1; i++) {
+		fwrite(&data->children[i], sizeof(int), 1, fp);
+		fwrite(&data->keys[i], sizeof(int), 1, fp);
+		fwrite(&data->pos[i], sizeof(int64), 1, fp);
 	}
-	fwrite(&data->ps[ORDEM-1], sizeof(int), 1, fp);
+	fwrite(&data->children[ORDEM-1], sizeof(int), 1, fp);
 
 }
 

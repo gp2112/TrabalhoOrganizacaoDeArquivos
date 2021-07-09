@@ -12,7 +12,7 @@
 
 
 int main(int argc, char const *argv[]) {
-	char csv_fname[20], bin_fname[20],
+	char csv_fname[20], bin_fname[20], index_name[20],
 			param[15], value[100];
 
 
@@ -68,6 +68,13 @@ int main(int argc, char const *argv[]) {
 			scanf("%d", &n);
 			erro = operation8(bin_fname, n);
 			break;
+
+		case (9):
+			scanf("%s", bin_fname);
+			scanf("%s", index_name);
+			erro = operation9(bin_fname, index_name);
+			break;
+
 	}
 
 

@@ -330,7 +330,7 @@ ERROR operation8(char *bin_fname, int n) {
 ERROR operation9(char *bin_fname, char *bin_index) {
 	FILE *bin_data = fopen(bin_fname, "rb"), *index_f = fopen(bin_index, "wb");
 
-	if (bin_data==NULL || index_f == NULl)
+	if (bin_data==NULL || index_f == NULL)
 		return FILE_ERROR;
 
 	// cria arquivo de índice e escreve header
@@ -344,40 +344,65 @@ ERROR operation9(char *bin_fname, char *bin_index) {
 
 	// cria raiz
 	INDEX_REG *root = create_indexreg(1);
-	escreve_index_data(bin_index, root);
+	root->folha = '1';
+	escreve_index_data(index_f, root);
 	free(root); root=NULL;
 	////////////////////
+
+	fclose(index_f);
 
 	// parametros para funcão de inserção (não precisam estar com valores atribuidos)
 	int promo_key, promo_child, promo_pos, insert_return=-1;
 
 	for (int i=0; i<header_veiculo->nroRegRemovidos; i++) {
-		veiculo = bin_get_veiculo(bin_fname, NULL, NULL); //pega o proximo veiculo
+		veiculo = bin_get_veiculo(bin_data, NULL, NULL); //pega o proximo veiculo
 
-		if (veiculo->removido == '1')
-			insert_return = btree_insert(index_f, index_header, convertePrefixo(veiculo->prefixo), ftell(bin_data)-veiculo->tamanhoRegistro, &promo_child, &promo_pos, &promo_key);
+		if (veiculo->removido == '1') {
+			printf("===================Nova Inserção==================%d\n\n", convertePrefixo(veiculo->prefixo));
+			insert_return = btree_insert(bin_index, index_header, index_header->noRaiz, convertePrefixo(veiculo->prefixo), ftell(bin_data)-veiculo->tamanhoRegistro, &promo_child, &promo_pos, &promo_key);
+		}
 
 		if (insert_return == PROMOTION) {
-			INDEX_REG *new_root = create_indexreg(header->RRNproxNo);
+
+			INDEX_REG *new_root = create_indexreg(++index_header->RRNproxNo);
+			new_root->nroChavesIndexadas++;
 			new_root->keys[0] = promo_key;
-			new_root->children[0] = root->RRNdoNo;
+			new_root->pos[0] = promo_pos;
+			new_root->children[0] = index_header->noRaiz;
 			new_root->children[1] = promo_child;
 			index_header->noRaiz = new_root->RRNdoNo;
-			index_header->RRNproxNo++;
+			//index_header->RRNproxNo++;
+
+			index_f = fopen(bin_index, "rb+");
+			escreve_index_data(index_f, new_root);
+			fclose(index_f);
+			printf("NEW ROOT\n");
+			print_node(new_root);
 			free(new_root);
 		}
 
 		veiculo_delete(&veiculo);
 
 	}
+
+	/// DEBUG ///////
+	//index_f = fopen(bin_index, "rb");
+	//btree_print(index_f, index_header->noRaiz);
+	//fclose(index_f);
+	//////////////////
+
+
+	index_f = fopen(bin_index, "rb+");
 	index_header->status = '1';
-	escreve_header_index(index_header);
-	free(root);
+	escreve_header_index(index_f, index_header);
+	free(root); free(index_header);
+	free(header_veiculo);
 	fclose(bin_data);
 	fclose(index_f);
+	binarioNaTela(bin_index);
 	return 0;
 }
-
+/*
 ERROR operation10(char *bin_fname, char *bin_index) {
 	FILE *bin_data = fopen(bin_fname, "rb"), *index_f = fopen(bin_index, "wb");
 
@@ -410,4 +435,4 @@ ERROR operation10(char *bin_fname, char *bin_index) {
 	fclose(bin_data);
 	fclose(index_f);
 	return 0;
-}
+}*/

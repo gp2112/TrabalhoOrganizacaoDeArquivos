@@ -11,6 +11,8 @@ void escreve_header_index(FILE *fp, INDEX_HEADER *h);
 void escreve_header_veiculo(FILE *fp, VEICULO_HEADER *hv);
 void escreve_header_linha(FILE *fp, LINHA_HEADER *hl);
 
+void escreve_index_data(FILE *fp, INDEX_REG *data);
+
 // Indentificar campos nulos como "NULO" //
 void escreve_veiculo(FILE *fp, VEICULO_HEADER *h, VEICULO *v);
 
