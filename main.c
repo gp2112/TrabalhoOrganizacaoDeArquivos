@@ -75,6 +75,13 @@ int main(int argc, char const *argv[]) {
 			erro = operation9(bin_fname, index_name);
 			break;
 
+		case (11):
+			scanf("%s", bin_fname);
+			scanf("%s", index_name);
+			scanf("%s", param);
+			scan_quote_string(value);
+			erro = operation11(bin_fname, index_name, value);
+			break;
 	}
 
 

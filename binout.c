@@ -4,7 +4,9 @@
 
 /// Operações de escrita no arquivo binário ///
 
-void escreve_header_index(FILE *fp, INDEX_HEADER *header) {
+void escreve_header_index(char *fname, INDEX_HEADER *header) {
+	FILE *fp = fopen(fname, "rb+");
+
 	if (ftell(fp) > 0) fseek(fp, 0, SEEK_SET);
 	fwrite(&header->status, sizeof(char), 1, fp);
 	fwrite(&header->noRaiz, sizeof(int), 1, fp);
@@ -13,10 +15,12 @@ void escreve_header_index(FILE *fp, INDEX_HEADER *header) {
 	for (int i=0; i<68; i++) lixo[i]='@';
 
 	fwrite(lixo, sizeof(char), 68, fp);
-
+	fclose(fp);
 }
 
-void escreve_index_data(FILE *fp, INDEX_REG *data) {
+void escreve_index_data(char *fname, INDEX_REG *data) {
+	FILE *fp = fopen(fname, "rb+");
+
 	// vai pra segunda página caso esteja na primeira (header)
 	fseek(fp, 77*data->RRNdoNo, SEEK_SET);
 
@@ -29,7 +33,7 @@ void escreve_index_data(FILE *fp, INDEX_REG *data) {
 		fwrite(&data->pos[i], sizeof(int64), 1, fp);
 	}
 	fwrite(&data->children[ORDEM-1], sizeof(int), 1, fp);
-
+	fclose(fp);
 }
 
 // escreve todo o header 

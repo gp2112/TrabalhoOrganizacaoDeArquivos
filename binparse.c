@@ -5,7 +5,9 @@
 
 /// Operações de leitura de arquivo binário ///
 
-INDEX_HEADER *bin_get_header_index(FILE *fp) {
+INDEX_HEADER *bin_get_header_index(char *fname) {
+	FILE *fp = fopen(fname, "rb");
+
 	INDEX_HEADER *header = (INDEX_HEADER *)malloc(sizeof(INDEX_HEADER));
 	if (ftell(fp) > 0) fseek(fp, 0, SEEK_SET);
 
@@ -13,12 +15,14 @@ INDEX_HEADER *bin_get_header_index(FILE *fp) {
 	fread(&header->noRaiz, sizeof(int), 1, fp);
 	fread(&header->RRNproxNo, sizeof(int), 1, fp);
 
+	fclose(fp);
 	return header;
 }
 
 
-INDEX_REG *bin_get_index_reg(FILE *fp, int rrn) {
-	
+INDEX_REG *bin_get_index_reg(char *fname, int rrn) {
+	FILE *fp = fopen(fname, "rb");
+
 	INDEX_REG *reg = (INDEX_REG *)malloc(sizeof(INDEX_REG));
 	
 	fseek(fp, 77*rrn, SEEK_SET);
@@ -36,6 +40,7 @@ INDEX_REG *bin_get_index_reg(FILE *fp, int rrn) {
 	}
 	fread(&reg->children[ORDEM-1], sizeof(int), 1, fp);
 
+	fclose(fp);
 	return reg;
 }
 

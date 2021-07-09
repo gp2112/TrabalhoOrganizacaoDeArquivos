@@ -4,6 +4,8 @@
 #include "binparse.h"
 #include "binout.h"
 
+#define DEBUG 0
+#define IS_D if(DEBUG)
 
 INDEX_HEADER *header_index_create() {
 	INDEX_HEADER *index = (INDEX_HEADER *)malloc(sizeof(INDEX_HEADER));
@@ -56,11 +58,11 @@ int binary_search(int *list, int key, int start, int end) {
 
 
 // retorna o byteoffset da chave ou retorna -1 caso não ache
-int64 btree_search(FILE *f, int rrn, int key) {
+int64 btree_search(char *fname, int rrn, int key) {
 	if (rrn == -1)
 		return -1;
 
-	INDEX_REG *node = bin_get_index_reg(f, rrn);
+	INDEX_REG *node = bin_get_index_reg(fname, rrn);
 
 	int i = binary_search(node->keys, key, 0, node->nroChavesIndexadas);
 
@@ -73,78 +75,16 @@ int64 btree_search(FILE *f, int rrn, int key) {
 	int next = node->children[i];
 	free(node);
 
-	return btree_search(f, next, key);
+	return btree_search(fname, next, key);
 }
 
-// CORRIGIR!!!!!!!!!!!
-// 3 FILHOS = 1 ???? 
-// [Entrada promokey: -1] ????
-// TESTAR OS FILHOS - ATRIBUICAO
-// FILHOS ESTÃO ERRADOS (SPLIT)
 
-void split(FILE *f, INDEX_REG *node, INDEX_REG *new_node, int key, int key_pos, int *promo_key, int *promo_pos, int *promo_child) {
-	printf("=====SPLIT!========\n");
-	int keys[ORDEM], pos[ORDEM], children[ORDEM+1];
-
-	for (int i=0; i<ORDEM; i++) {
-		if (i<ORDEM-1) {
-			keys[i] = node->keys[i];
-			pos[i] = node->pos[i];
-			
-			// "Apaga" os valores
-			node->keys[i] = -1;
-			node->pos[i] = -1;
-		}
-		children[i] = node->children[i];
-	}
-
-	int index = binary_search(keys, key, 0, ORDEM-1);
-	
-	for (int i=ORDEM; i>index; i--) {
-		if (i<ORDEM-1) {
-			keys[i] = keys[i-1];
-			pos[i] = pos[i-1];
-		}
-		//////////////////// NAO PEGAR DO MEIO - VERIFICAR -1
-		children[i] = children[i-1];
-	}
-	keys[index] = key;
-	pos[index] = key_pos;
-	children[index+1] = new_node->RRNdoNo;
-
-	*promo_key = keys[(int)(ORDEM/2)]; // chave a esquerda da direita
-	*promo_pos = pos[(int)(ORDEM/2)];
-	*promo_child = children[(int)(ORDEM/2)];
-
-
-	for (int i=0; i<(int)(ORDEM/2); i++) {
-		node->keys[i] = keys[i];
-		node->pos[i] = pos[i];
-		node->children[i] = children[i];
-		new_node->keys[i] = keys[(int)(ORDEM/2)+1+i];
-		new_node->pos[i] = pos[(int)(ORDEM/2)+1+i];
-		new_node->children[i] = children[(int)(ORDEM/2)+1+i];
-	}
-	node->nroChavesIndexadas = (int)(ORDEM/2);
-	new_node->nroChavesIndexadas = (int)(ORDEM/2);
-	new_node->folha = '1';
-}	
-
-
-/*
-typedef struct {
-	char folha;
-	int nroChavesIndexadas;
-	int RRNdoNo;
-	int children[ORDEM];
-	int keys[ORDEM-1]; // ordenado !
-	int64 pos[ORDEM-1];
-
-} INDEX_REG;
-
-*/
-
+// imprime um nó
 void print_node(INDEX_REG *node) {
+	if (node==NULL) {
+		printf("NO NULO!!!!!\n");
+		return;
+	}
 	printf("\n===== NODE =====\n");
 	printf("folha: %c\n", node->folha);
 	printf("nroChavesIndexadas: %d\n", node->nroChavesIndexadas);
@@ -160,25 +100,83 @@ void print_node(INDEX_REG *node) {
 		printf("%d ", node->children[i]); printf("\n");
 
 	printf("\n");
+
 }
+// percorre a arvore para imprimir os nos 
+void btree_print(char *fname, int rrn) {
 
-void btree_print(FILE *f, int rrn) {
-
-	INDEX_REG *node = bin_get_index_reg(f, rrn);
-
-	int i=0;
-	while (node->children[i] != -1)
-		btree_print(f, node->children[i++]);
+	INDEX_REG *node = bin_get_index_reg(fname, rrn);
+	if (node==NULL)
+		return;
 
 	print_node(node);
+
+	for (int i=0; i<ORDEM; i++) {
+		if (node->children[i] != -1)
+			btree_print(fname, node->children[i]);
+	}
+
 
 	free(node);
 }
 
+
+void split(char *fname, INDEX_REG *node, INDEX_REG *new_node, int key, int key_pos, int *promo_key, int *promo_pos, int *promo_child) {
+	IS_D printf("\n======SPLIT!========\n");
+	int keys[ORDEM], pos[ORDEM], children[ORDEM+1];
+
+	for (int i=0; i<ORDEM; i++) {
+		if (i<ORDEM-1) {
+			keys[i] = node->keys[i];
+			pos[i] = node->pos[i];
+			
+			// "Apaga" os valores
+			node->keys[i] = -1;
+			node->pos[i] = -1;
+		}
+		children[i] = node->children[i];
+		node->children[i] = -1;
+	}
+
+	// acha a posicao da chave
+	int index = binary_search(keys, key, 0, ORDEM-1);
+	
+	// inserção
+	for (int i=ORDEM; i>index; i--) {
+		if (i<ORDEM) {
+			keys[i] = keys[i-1];
+			pos[i] = pos[i-1];
+		}
+		children[i] = children[i-1];
+	}
+	keys[index] = key;
+	pos[index] = key_pos;
+	children[index+1] = *promo_child;
+
+	*promo_key = keys[(int)(ORDEM/2)]; // chave a esquerda da direita
+	*promo_pos = pos[(int)(ORDEM/2)];
+	*promo_child = new_node->RRNdoNo;
+
+
+	for (int i=0; i<(int)(ORDEM/2); i++) {
+		node->keys[i] = keys[i];
+		node->pos[i] = pos[i];
+		node->children[i] = children[i];
+		new_node->keys[i] = keys[(int)(ORDEM/2)+1+i];
+		new_node->pos[i] = pos[(int)(ORDEM/2)+1+i];
+		new_node->children[i] = children[(int)(ORDEM/2)+i];
+	}
+	new_node->children[(int)(ORDEM/2)] = children[ORDEM-1];
+	new_node->children[(int)(ORDEM/2)+1] = children[ORDEM];
+	node->nroChavesIndexadas = (int)(ORDEM/2);
+	new_node->nroChavesIndexadas = (int)(ORDEM/2);
+	new_node->folha = '1';
+}	
+
 int btree_insert(char *fname, INDEX_HEADER *header, int rrn, int key, int pos, int *promo_child, int *promo_pos, int *promo_key) {
 
 	if (rrn == -1) {
-		printf("mudei -1\n");
+		IS_D printf("mudei -1\n");
 		*promo_key = key;
 		*promo_pos = pos;
 		*promo_child = -1;
@@ -186,28 +184,26 @@ int btree_insert(char *fname, INDEX_HEADER *header, int rrn, int key, int pos, i
 	}
 
 	// le a pagina
-	FILE *f = fopen(fname, "rb");
-	printf("RRN %d\n", rrn);
-	INDEX_REG *node = bin_get_index_reg(f, rrn);
-	fclose(f);
 	
-	print_node(node);
+	IS_D printf("RRN %d\n", rrn);
+	INDEX_REG *node = bin_get_index_reg(fname, rrn);
+	
+	
+	IS_D print_node(node);
 
 	int i = binary_search(node->keys, key, 0, node->nroChavesIndexadas);
 
 	int r = btree_insert(fname, header, node->children[i], key, pos, promo_child, promo_pos, promo_key);
 	
-	printf("Entrada promokey: %d\n", *promo_child);
+	IS_D printf("Entrada promokey: %d\n", *promo_child);
 
 	if (r == NO_PROMOTION) {
 		free(node);
 		return r;
 	}
 
-	f = fopen(fname, "rb+");
-
 	if (node->nroChavesIndexadas < ORDEM-1) {
-		printf("É o PAI\n");
+		IS_D printf("É o PAI\n");
 		i = binary_search(node->keys, *promo_key, 0, node->nroChavesIndexadas);
 
 		for (int j=node->nroChavesIndexadas+1; j>i; j--) {
@@ -226,24 +222,27 @@ int btree_insert(char *fname, INDEX_HEADER *header, int rrn, int key, int pos, i
 			node->folha = '0';
 		}
 
-		print_node(node);
-		escreve_index_data(f, node);
-		free(node); fclose(f);
+		IS_D print_node(node);
+		escreve_index_data(fname, node);
+		free(node);
 		return NO_PROMOTION;
 	}
 
 
-	INDEX_REG *new_node = create_indexreg(++header->RRNproxNo);
+	INDEX_REG *new_node = create_indexreg(header->RRNproxNo);
 
-	split(f, node, new_node, key, pos, promo_key, promo_pos, promo_child);
-	printf("Promo child: %d", *promo_child);
-	printf("\n");
-	print_node(node);
-	print_node(new_node); printf("\n");
-	escreve_index_data(f, node);
-	escreve_index_data(f, new_node);
+	split(fname, node, new_node, key, pos, promo_key, promo_pos, promo_child);
 
-	fclose(f);
+	IS_D printf("Promo child: %d", *promo_child);
+	IS_D printf("\n");
+	IS_D print_node(node);
+	IS_D print_node(new_node); 
+	IS_D printf("\n");
+
+	escreve_index_data(fname, node);
+	escreve_index_data(fname, new_node);
+	header->RRNproxNo++;
+
 	free(node); free(new_node);
 
 	return PROMOTION;

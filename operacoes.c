@@ -5,6 +5,9 @@
 #include "operacoes.h"
 #include "util.h"
 
+#define DEBUG 0
+#define IS_D if(DEBUG)
+
 ERROR operation1(char *csv_fname, char *bin_fname) {
 	FILE *csv_f=fopen(csv_fname, "r"), *bin_f=fopen(bin_fname, "wb");
 
@@ -328,14 +331,16 @@ ERROR operation8(char *bin_fname, int n) {
 
 
 ERROR operation9(char *bin_fname, char *bin_index) {
-	FILE *bin_data = fopen(bin_fname, "rb"), *index_f = fopen(bin_index, "wb");
+	FILE *bin_data = fopen(bin_fname, "rb"), 
+			*index_f = fopen(bin_index, "wb"); //cria arquivo de indice
+	fclose(index_f);
 
 	if (bin_data==NULL || index_f == NULL)
 		return FILE_ERROR;
 
 	// cria arquivo de índice e escreve header
 	INDEX_HEADER *index_header = header_index_create();
-	escreve_header_index(index_f, index_header);
+	escreve_header_index(bin_index, index_header);
 
 	
 	VEICULO_HEADER *header_veiculo = bin_get_header_veiculo(bin_data);
@@ -345,61 +350,58 @@ ERROR operation9(char *bin_fname, char *bin_index) {
 	// cria raiz
 	INDEX_REG *root = create_indexreg(1);
 	root->folha = '1';
-	escreve_index_data(index_f, root);
+	escreve_index_data(bin_index, root);
+	index_header->RRNproxNo++;
 	free(root); root=NULL;
 	////////////////////
 
-	fclose(index_f);
 
 	// parametros para funcão de inserção (não precisam estar com valores atribuidos)
 	int promo_key, promo_child, promo_pos, insert_return=-1;
+	int64 byteoffset;
 
 	for (int i=0; i<header_veiculo->nroRegRemovidos; i++) {
+		byteoffset = ftell(bin_data);
 		veiculo = bin_get_veiculo(bin_data, NULL, NULL); //pega o proximo veiculo
-
+		//print_veiculo(veiculo);
 		if (veiculo->removido == '1') {
-			printf("===================Nova Inserção==================%d\n\n", convertePrefixo(veiculo->prefixo));
-			insert_return = btree_insert(bin_index, index_header, index_header->noRaiz, convertePrefixo(veiculo->prefixo), ftell(bin_data)-veiculo->tamanhoRegistro, &promo_child, &promo_pos, &promo_key);
+			IS_D printf("===================Nova Inserção==================\ninsere: %d\n\n", convertePrefixo(veiculo->prefixo));
+			insert_return = btree_insert(bin_index, index_header, index_header->noRaiz, convertePrefixo(veiculo->prefixo), byteoffset, &promo_child, &promo_pos, &promo_key);
+
+			if (insert_return == PROMOTION) {
+
+				INDEX_REG *new_root = create_indexreg(index_header->RRNproxNo);
+				new_root->nroChavesIndexadas++;
+				new_root->keys[0] = promo_key;
+				new_root->pos[0] = promo_pos;
+				new_root->children[0] = index_header->noRaiz;
+				new_root->children[1] = promo_child;
+				index_header->noRaiz = new_root->RRNdoNo;
+				index_header->RRNproxNo++;
+				
+				escreve_index_data(bin_index, new_root);
+				
+				IS_D printf("NEW ROOT\n");
+				IS_D print_node(new_root);
+				free(new_root);
+			}
 		}
-
-		if (insert_return == PROMOTION) {
-
-			INDEX_REG *new_root = create_indexreg(++index_header->RRNproxNo);
-			new_root->nroChavesIndexadas++;
-			new_root->keys[0] = promo_key;
-			new_root->pos[0] = promo_pos;
-			new_root->children[0] = index_header->noRaiz;
-			new_root->children[1] = promo_child;
-			index_header->noRaiz = new_root->RRNdoNo;
-			//index_header->RRNproxNo++;
-
-			index_f = fopen(bin_index, "rb+");
-			escreve_index_data(index_f, new_root);
-			fclose(index_f);
-			printf("NEW ROOT\n");
-			print_node(new_root);
-			free(new_root);
-		}
-
 		veiculo_delete(&veiculo);
 
 	}
 
-	/// DEBUG ///////
-	//index_f = fopen(bin_index, "rb");
-	//btree_print(index_f, index_header->noRaiz);
-	//fclose(index_f);
-	//////////////////
-
-
-	index_f = fopen(bin_index, "rb+");
 	index_header->status = '1';
-	escreve_header_index(index_f, index_header);
+	escreve_header_index(bin_index, index_header);
+	fclose(bin_data);
+	binarioNaTela(bin_index);
+
+	/*=============== DEBUG ======================
+	printf("\n\n=====IMPRIME ARVORE=====\n\n");
+	btree_print(bin_index, index_header->noRaiz);
+	
 	free(root); free(index_header);
 	free(header_veiculo);
-	fclose(bin_data);
-	fclose(index_f);
-	binarioNaTela(bin_index);
+	//============================================*/
 	return 0;
 }
 /*
@@ -436,3 +438,25 @@ ERROR operation10(char *bin_fname, char *bin_index) {
 	fclose(index_f);
 	return 0;
 }*/
+
+ERROR operation11(char *bin_fname, char *bin_index, char *prefixo) {
+	INDEX_HEADER *index_header = bin_get_header_index(bin_index);
+
+	int64 veiculo_offset = btree_search(bin_index, index_header->noRaiz, convertePrefixo(prefixo));
+	if (veiculo_offset == -1) {
+		free(index_header);
+		return REG_NULL;
+	}
+
+	FILE *veiculo_file = fopen(bin_fname, "rb");
+	if (veiculo_file == NULL)
+		return FILE_ERROR;
+
+	fseek(veiculo_file, veiculo_offset, SEEK_SET);
+	VEICULO *veiculo = bin_get_veiculo(veiculo_file, NULL, NULL);
+	print_veiculo(veiculo);
+	veiculo_delete(&veiculo);
+	fclose(veiculo_file);
+	
+	return 0;
+}
