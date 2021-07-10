@@ -5,7 +5,11 @@
 
 /// Operações de leitura de arquivo binário ///
 
-INDEX_HEADER *bin_get_header_index(FILE *fp) {
+INDEX_HEADER *bin_get_header_index(char *fname) {
+	FILE *fp = fopen(fname, "rb");
+	if (fp == NULL)
+		return NULL;
+
 	INDEX_HEADER *header = (INDEX_HEADER *)malloc(sizeof(INDEX_HEADER));
 	if (ftell(fp) > 0) fseek(fp, 0, SEEK_SET);
 
@@ -13,27 +17,35 @@ INDEX_HEADER *bin_get_header_index(FILE *fp) {
 	fread(&header->noRaiz, sizeof(int), 1, fp);
 	fread(&header->RRNproxNo, sizeof(int), 1, fp);
 
+	fclose(fp);
 	return header;
 }
 
 
-INDEX_REG *bin_get_index_reg(FILE *fp, int rrn) {
+INDEX_REG *bin_get_index_reg(char *fname, int rrn) {
+	FILE *fp = fopen(fname, "rb");
+
+	if (fp == NULL)
+		return NULL;
+
 	INDEX_REG *reg = (INDEX_REG *)malloc(sizeof(INDEX_REG));
 	
-	fseek(fp, 77*rrn, SEEK_SET);
+	fseek(fp, 77*(rrn+1), SEEK_SET);
 
 	if (fread(&reg->folha, sizeof(char), 1, fp) != 1)
 		return NULL;
+	
 
 	fread(&reg->nroChavesIndexadas, sizeof(int), 1, fp);
 	fread(&reg->RRNdoNo, sizeof(int), 1, fp);
-	for (int i=0; i<ORDEM; i++) {
-		fread(&reg->ps[i], sizeof(int), 1, fp);
-		fread(&reg->cs[i], sizeof(int), 1, fp);
-		fread(&reg->prs[i], sizeof(int64), 1, fp);
+	for (int i=0; i<ORDEM-1; i++) {
+		fread(&reg->children[i], sizeof(int), 1, fp);
+		fread(&reg->keys[i], sizeof(int), 1, fp);
+		fread(&reg->pos[i], sizeof(int64), 1, fp);
 	}
-	fread(&reg->ps[ORDEM-1], sizeof(int), 1, fp);
+	fread(&reg->children[ORDEM-1], sizeof(int), 1, fp);
 
+	fclose(fp);
 	return reg;
 }
 

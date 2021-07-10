@@ -4,7 +4,11 @@
 
 /// Operações de escrita no arquivo binário ///
 
-void escreve_header_index(FILE *fp, INDEX_HEADER *header) {
+int escreve_header_index(char *fname, INDEX_HEADER *header) {
+	FILE *fp = fopen(fname, "rb+");
+	if (fp == NULL)
+		return 1;
+
 	if (ftell(fp) > 0) fseek(fp, 0, SEEK_SET);
 	fwrite(&header->status, sizeof(char), 1, fp);
 	fwrite(&header->noRaiz, sizeof(int), 1, fp);
@@ -13,23 +17,29 @@ void escreve_header_index(FILE *fp, INDEX_HEADER *header) {
 	for (int i=0; i<68; i++) lixo[i]='@';
 
 	fwrite(lixo, sizeof(char), 68, fp);
-
+	fclose(fp);
+	return 0;
 }
 
-void escreve_index_data(FILE *fp, INDEX_REG *data) {
+int escreve_index_data(char *fname, INDEX_REG *data) {
+	FILE *fp = fopen(fname, "rb+");
+	if (fp == NULL)
+		return 1;
+
 	// vai pra segunda página caso esteja na primeira (header)
-	fseek(fp, 77*data->RRNdoNo, SEEK_SET);
+	fseek(fp, 77*(data->RRNdoNo+1), SEEK_SET);
 
 	fwrite(&data->folha, sizeof(char), 1, fp);
 	fwrite(&data->nroChavesIndexadas, sizeof(int), 1, fp);
-	fwrite(&data->RRNdoNo, sizeof(char), 1, fp);
-	for (int i=0; i<ORDEM; i++) {
-		fwrite(&data->ps[i], sizeof(int), 1, fp);
-		fwrite(&data->cs[i], sizeof(int), 1, fp);
-		fwrite(&data->prs[i], sizeof(int64), 1, fp);
+	fwrite(&data->RRNdoNo, sizeof(int), 1, fp);
+	for (int i=0; i<ORDEM-1; i++) {
+		fwrite(&data->children[i], sizeof(int), 1, fp);
+		fwrite(&data->keys[i], sizeof(int), 1, fp);
+		fwrite(&data->pos[i], sizeof(int64), 1, fp);
 	}
-	fwrite(&data->ps[ORDEM-1], sizeof(int), 1, fp);
-
+	fwrite(&data->children[ORDEM-1], sizeof(int), 1, fp);
+	fclose(fp);
+	return 0;
 }
 
 // escreve todo o header 

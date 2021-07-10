@@ -12,7 +12,7 @@
 
 
 int main(int argc, char const *argv[]) {
-	char csv_fname[20], bin_fname[20],
+	char csv_fname[20], bin_fname[20], index_name[20],
 			param[15], value[100];
 
 
@@ -67,6 +67,53 @@ int main(int argc, char const *argv[]) {
 			scanf("%s", bin_fname);
 			scanf("%d", &n);
 			erro = operation8(bin_fname, n);
+			break;
+
+		case (9):
+			scanf("%s", bin_fname);
+			scanf("%s", index_name);
+			erro = operation9(bin_fname, index_name);
+			break;
+
+		case (10):
+			scanf("%s", bin_fname);
+			scanf("%s", index_name);
+			erro = operation10(bin_fname, index_name);
+			break;
+
+		case (11):
+			scanf("%s", bin_fname);
+			scanf("%s", index_name);
+			scanf("%s", param);
+			scan_quote_string(value);
+			erro = operation11(bin_fname, index_name, value);
+			break;
+
+		case (12):
+			scanf("%s", bin_fname);
+			scanf("%s", index_name);
+			scanf("%s", param);
+			scanf("%d", &n);
+			erro = operation12(bin_fname, index_name, n);
+			break;
+
+		case (13):
+			scanf("%s", bin_fname);
+			scanf("%s", index_name);
+			scanf("%d", &n);
+			erro = operation13(bin_fname, index_name, n);
+			break;
+
+		case (14):
+			scanf("%s", bin_fname);
+			scanf("%s", index_name);
+			scanf("%d", &n);
+			erro = operation14(bin_fname, index_name, n);
+			break;
+
+		case (-1):
+			scanf("%s", bin_fname);
+			erro = op22(bin_fname);
 			break;
 	}
 

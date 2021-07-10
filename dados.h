@@ -97,4 +97,7 @@ void print_linha(LINHA *linha);
 
 void print_veiculo(VEICULO *veiculo);
 
+VEICULO *veiculo_input();
+LINHA *linha_input();
+
 #endif

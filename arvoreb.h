@@ -9,9 +9,15 @@ typedef struct btree_ BTREE;
 	#define ORDEM 5
 #endif
 
-BTREE *btree_create();
-int btree_search(BTREE *btree, int key);
-void btree_insert(BTREE *btree, int key);
-void btree_delete(BTREE **btree);
+#define NO_PROMOTION 0
+#define PROMOTION 1
+
+
+INDEX_HEADER *header_index_create();
+INDEX_REG *create_indexreg(int rrn);
+int64 btree_search(char *fname, int rrn, int key);
+int btree_insert(char *fname, INDEX_HEADER *header, int rrn, int key, int pos, int *promo_child, int *promo_pos, int *promo_key);
+void btree_print(char *fname, int rrn);
+void print_node(INDEX_REG *node);
 
 #endif
