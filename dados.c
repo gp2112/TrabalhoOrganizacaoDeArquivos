@@ -29,19 +29,6 @@ void veiculo_delete(VEICULO **veiculo) {
 }
 ///////////////////////////////////
 
-
-INDEX_HEADER *header_index_create() {
-	INDEX_HEADER *index = (INDEX_HEADER *)malloc(sizeof(INDEX_HEADER));
-
-	if (index != NULL) {
-		index->status = '0';
-		index->noRaiz = -1;
-		index->RRNproxNo = 77;
-	}
-
-	return index;
-}
-
 // inicia um header de linha om valores iniciais
 LINHA_HEADER *header_linha_create(FILE *fp) {
 	LINHA_HEADER *header = (LINHA_HEADER *)malloc(sizeof(LINHA_HEADER));
@@ -91,8 +78,6 @@ void print_linha(LINHA *linha) {
 	else if (linha->aceitaCartao == 'F')
 		printf("PAGAMENTO EM CARTAO SOMENTE NO FINAL DE SEMANA\n");
 	else printf("campo com valor nulo\n");
-
-	printf("\n");
 }
 
 void print_veiculo(VEICULO *veiculo) {
@@ -120,6 +105,101 @@ void print_veiculo(VEICULO *veiculo) {
 	if (veiculo->quantidadeLugares == -1)
 		printf("Quantidade de lugares sentados disponiveis: campo com valor nulo\n");
 	else printf("Quantidade de lugares sentados disponiveis: %d\n", veiculo->quantidadeLugares);
-
-	printf("\n");
 }
+
+// coleta veiculo com os parametros do usuario
+VEICULO *veiculo_input() {
+
+		VEICULO *veiculo = (VEICULO *)malloc(sizeof(VEICULO));
+
+		char temp[100];
+		
+		scan_quote_string(veiculo->prefixo);
+		if (strcmp(veiculo->prefixo, "NULO")==0)
+			preenche_lixo(veiculo->prefixo, 0, 5);
+		else
+			preenche_lixo(veiculo->prefixo, strlen(veiculo->prefixo), 5);
+		
+
+		scan_quote_string(veiculo->data);
+		if (strcmp(veiculo->data, "NULO")==0)
+			preenche_lixo(veiculo->data, 0, 11);
+		else
+			preenche_lixo(veiculo->data, strlen(veiculo->data), 11);
+
+		scanf("%d %d", &veiculo->quantidadeLugares, &veiculo->codLinha);
+
+		scan_quote_string(temp);
+		if (strcmp(temp, "NULO")==0) {
+			veiculo->tamanhoModelo = 0;
+			veiculo->modelo = NULL;
+		}
+		else {
+			veiculo->tamanhoModelo = strlen(temp);
+			veiculo->modelo = (char *)calloc(veiculo->tamanhoModelo+1, sizeof(char));
+			strcpy(veiculo->modelo, temp);
+		}
+
+		scan_quote_string(temp);
+		if (strcmp(temp, "NULO")==0) {
+			veiculo->tamanhoCategoria = 0;
+			veiculo->categoria = NULL;
+		}
+		else {
+			veiculo->tamanhoCategoria = strlen(temp);
+			veiculo->categoria = (char *)calloc(veiculo->tamanhoCategoria+1, sizeof(char));
+			strcpy(veiculo->categoria, temp);
+		}
+
+		veiculo->tamanhoRegistro = 31 + veiculo->tamanhoCategoria + veiculo->tamanhoModelo;
+		veiculo->removido = '1';
+}
+
+LINHA *linha_input() {
+		LINHA *linha = (LINHA *)malloc(sizeof(LINHA));
+		
+		char temp[100];
+
+		scanf("%d", &linha->codLinha);
+
+		scan_quote_string(&linha->aceitaCartao);
+
+		scan_quote_string(temp);
+		if (strcmp(temp, "NULO") == 0) {
+			linha->nomeLinha = NULL;
+			linha->tamanhoNome = 0;
+		
+		} else {
+			linha->tamanhoNome = strlen(temp);
+			linha->nomeLinha = (char*)calloc(linha->tamanhoNome+1, sizeof(char));
+			strcpy(linha->nomeLinha, temp);
+		}
+
+		scan_quote_string(temp);
+		if (strcmp(temp, "NULO") == 0) {
+			linha->corLinha = NULL;
+			linha->tamanhoCor = 0;
+		}
+		else {
+			linha->tamanhoCor = strlen(temp);
+			linha->corLinha = (char*)calloc(linha->tamanhoCor+1, sizeof(char));
+			strcpy(linha->corLinha, temp);
+		}
+		linha->tamanhoRegistro = 13 + linha->tamanhoNome + linha->tamanhoCor;
+		linha->removido = '1';
+}
+
+/*
+
+typedef struct {
+	char folha;
+	int nroChavesIndexadas;
+	int RRNdoNo;
+	int ps[ORDEM];
+	int cs[ORDEM-1]; // ordenado !
+	int64 prs[ORDEM-1];
+
+} INDEX_REG;
+
+*/
+

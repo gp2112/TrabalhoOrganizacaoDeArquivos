@@ -13,9 +13,9 @@ typedef struct {
 	char folha;
 	int nroChavesIndexadas;
 	int RRNdoNo;
-	int ps[ORDEM];
-	int cs[ORDEM-1]; // ordenado !
-	int64 prs[ORDEM-1];
+	int children[ORDEM];
+	int keys[ORDEM-1]; // ordenado !
+	int64 pos[ORDEM-1];
 
 } INDEX_REG;
 
@@ -96,5 +96,8 @@ VEICULO_HEADER *header_veiculo_create(FILE *fp);
 void print_linha(LINHA *linha);
 
 void print_veiculo(VEICULO *veiculo);
+
+VEICULO *veiculo_input();
+LINHA *linha_input();
 
 #endif
