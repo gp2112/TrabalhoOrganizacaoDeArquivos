@@ -216,3 +216,23 @@ void get_mes_nome(char *date, char *mes_nome) {
 			break;
 	}
 }
+
+void reverse(char *buffer, int size) {
+	char aux;
+	for (int i=0; i<size/2; i++) {
+		aux = buffer[size-i-1];
+		buffer[size-i-1] = buffer[i];
+		buffer[i] = aux;
+	}
+}
+
+// converte um int para sua representacao em string
+void itoa(int num, char *buffer) {
+	int digit, i=0;
+	do {
+		digit = num%10;
+		buffer[i++] = '0'+digit;
+	} while (((int)(num/=10))>0);
+	buffer[i] = '\0';
+	reverse(buffer, i);
+}

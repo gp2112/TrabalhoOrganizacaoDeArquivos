@@ -705,6 +705,161 @@ ERROR operation14(char *bin_fname, char *bin_index, int n) {
 	return 0;
 }
 
+
+ERROR operation15(char *veic_f, char *linha_f) {
+	FILE *veiculo_file = fopen(veic_f, "rb"),
+		 *linha_file = fopen(linha_f, "rb");
+
+
+	// verifica se arquivos existem
+	if (veiculo_file == NULL) {
+		if(linha_file!=NULL) fclose(linha_file);
+		return FILE_ERROR;
+	}
+	if (linha_file == NULL) {
+		if(linha_file!=NULL) fclose(veiculo_file);
+		return FILE_ERROR;
+	}
+
+	LINHA_HEADER *linha_header = bin_get_header_linha(linha_file);
+	VEICULO_HEADER *veiculo_header = bin_get_header_veiculo(veiculo_file);
+
+	// verifica status dos arquivos
+	if (linha_header->status == '0' || veiculo_header->status == '0') {
+		free(linha_header); free(veiculo_header);
+		fclose(veiculo_file); fclose(linha_file);
+		return FILE_ERROR;
+	}
+
+
+	VEICULO *veiculo = NULL;
+	LINHA *linha = NULL;
+
+	char codLinhastr[7];
+	int count=0;
+
+	while ((veiculo=bin_get_veiculo(veiculo_file, NULL, NULL)) != NULL) {
+		if (veiculo->removido=='0') {
+			veiculo_delete(&veiculo);
+			continue;
+		}
+
+		itoa(veiculo->codLinha, codLinhastr);
+		// busca a linha com codLinha específico
+		linha = bin_get_linha(linha_file, "codLinha", codLinhastr);
+
+		// volta pro primeiro registro
+		fseek(linha_file, 82, SEEK_SET);
+
+		if (linha != NULL) {
+			print_veiculo(veiculo);
+			//printf("codLinha: %d\n",veiculo->codLinha);
+			print_linha(linha);
+			linha_delete(&linha);
+			printf("\n");
+			count++;
+		}
+
+
+		veiculo_delete(&veiculo);
+	}
+
+	free(linha_header);
+	free(veiculo_header);
+
+	fclose(veiculo_file);
+	fclose(linha_file);
+
+	if (count == 0)
+		return REG_NULL;
+
+	return 0;
+}
+
+ERROR operation16(char *veic_f, char *linha_f, char *index_f) {
+	FILE *veiculo_file = fopen(veic_f, "rb"),
+		 *linha_file = fopen(linha_f, "rb");
+
+	// verifica se arquivos existem
+	if (veiculo_file == NULL) {
+		if(linha_file!=NULL) fclose(linha_file);
+		return FILE_ERROR;
+	}
+	if (linha_file == NULL) {
+		if(linha_file!=NULL) fclose(veiculo_file);
+		return FILE_ERROR;
+	}
+
+
+	INDEX_HEADER *index_header = bin_get_header_index(index_f);
+	if (index_header==NULL) {
+		fclose(veiculo_file);
+		fclose(linha_file);
+		return FILE_ERROR;
+	}
+	///
+
+
+	LINHA_HEADER *linha_header = bin_get_header_linha(linha_file);
+	VEICULO_HEADER *veiculo_header = bin_get_header_veiculo(veiculo_file);
+
+	// verifica status dos arquivos
+	if (linha_header->status == '0' || veiculo_header->status == '0' || index_header->status=='0') {
+		free(linha_header); free(veiculo_header); free(index_header);
+		fclose(veiculo_file); fclose(linha_file);
+		return FILE_ERROR;
+	}
+
+
+	VEICULO *veiculo = NULL;
+	LINHA *linha = NULL;
+	int64 byteoffset;
+	int count = 0;
+
+	while ((veiculo=bin_get_veiculo(veiculo_file, NULL, NULL)) != NULL) {
+
+		if (veiculo->removido=='0') {
+			veiculo_delete(&veiculo);
+			continue;
+		}
+
+		// busca o byteoffset da linha com o codLinha específico na arvore B
+		byteoffset = btree_search(index_f, index_header->noRaiz, veiculo->codLinha);
+
+		// se o byteoffset não for -1, o registro existe, imprimindo os dados
+		if (byteoffset != -1) {
+			
+			// lê a Linha na posição encontrada
+			fseek(linha_file, byteoffset, SEEK_SET);
+			linha = bin_get_linha(linha_file, NULL, NULL);
+			
+			print_veiculo(veiculo);
+			print_linha(linha);
+			printf("\n");
+			
+			linha_delete(&linha);
+			count++;
+		}
+
+		veiculo_delete(&veiculo);
+	}
+
+	free(index_header);
+	free(linha_header);
+	free(veiculo_header);
+	fclose(veiculo_file);
+	fclose(linha_file);
+
+	if (count == 0)
+		return REG_NULL;
+
+	return 0;
+}
+
+
+
+
+
 // funcão para imprimir toda a árvore (para Debug)
 ERROR op22(char *bin_f) {
 	INDEX_HEADER *index_header = bin_get_header_index(bin_f);

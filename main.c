@@ -111,6 +111,23 @@ int main(int argc, char const *argv[]) {
 			erro = operation14(bin_fname, index_name, n);
 			break;
 
+		case (15):
+			scanf("%s", bin_fname);
+			scanf("%s", csv_fname);
+			scanf("%s", param);
+			scanf("%s", param);
+			erro = operation15(bin_fname, csv_fname);
+			break;
+
+		case (16):
+			scanf("%s", bin_fname);
+			scanf("%s", csv_fname);
+			scanf("%s", param);
+			scanf("%s", param);
+			scanf("%s", index_name);
+			erro = operation16(bin_fname, csv_fname, index_name);
+			break;
+
 		case (-1):
 			scanf("%s", bin_fname);
 			erro = op22(bin_fname);

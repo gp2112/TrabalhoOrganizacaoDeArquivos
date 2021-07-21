@@ -78,8 +78,6 @@ void print_linha(LINHA *linha) {
 	else if (linha->aceitaCartao == 'F')
 		printf("PAGAMENTO EM CARTAO SOMENTE NO FINAL DE SEMANA\n");
 	else printf("campo com valor nulo\n");
-
-	printf("\n");
 }
 
 void print_veiculo(VEICULO *veiculo) {
@@ -107,8 +105,6 @@ void print_veiculo(VEICULO *veiculo) {
 	if (veiculo->quantidadeLugares == -1)
 		printf("Quantidade de lugares sentados disponiveis: campo com valor nulo\n");
 	else printf("Quantidade de lugares sentados disponiveis: %d\n", veiculo->quantidadeLugares);
-
-	printf("\n");
 }
 
 // coleta veiculo com os parametros do usuario
