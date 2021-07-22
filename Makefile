@@ -1,7 +1,7 @@
 
 
 all:
-	gcc *.c -o trabalho1
+	gcc *.c -o trabalho1 -g
 
 run:
 	./trabalho1
