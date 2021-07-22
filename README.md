@@ -3,7 +3,7 @@
 Trabalho para a disciplina de Organização de Arquivos 2021 - ICMC/USP
 
 ### Grupo:
-* Guilherme Paixão
+* Guilherme Ramos Costa Paixão
 * Dennis Lemke Green
 
 ### Especificação:
