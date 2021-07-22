@@ -26,5 +26,9 @@ ERROR operation13(char *bin_fname, char *bin_index, int n);
 ERROR operation14(char *bin_fname, char *bin_index, int n);
 ERROR operation15(char *veic_f, char *linha_f);
 ERROR operation16(char *veic_f, char *linha_f, char *index_f);
+ERROR operation17(char *veiculo_f, char *veiculo_sorted);
+ERROR operation18(char *linha_f, char *linha_sorted);
+ERROR operation19(char *veic_f, char *linha_f);
+
 ERROR op22(char *bin_f);
 #endif

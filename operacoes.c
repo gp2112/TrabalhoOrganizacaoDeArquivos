@@ -83,8 +83,10 @@ ERROR operation3(char *bin_fname) {
 
 
 	do {
-		if (veiculo->removido == '1')
+		if (veiculo->removido == '1') {
 			print_veiculo(veiculo);
+			printf("codlinha: %d\n", veiculo->codLinha);
+		}
 		veiculo_delete(&veiculo);
 	} while ((veiculo=bin_get_veiculo(bin_f, NULL, NULL)) != NULL);
 
@@ -114,8 +116,10 @@ ERROR operation4(char *bin_fname) {
 	}
 
 	do {
-		if (linha->removido == '1')
+		if (linha->removido == '1') {
 			print_linha(linha);
+			printf("\n");
+		}
 		linha_delete(&linha);
 	} while ((linha=bin_get_linha(bin_f, NULL, NULL)) != NULL);
 
@@ -745,6 +749,7 @@ ERROR operation15(char *veic_f, char *linha_f) {
 		}
 
 		itoa(veiculo->codLinha, codLinhastr);
+
 		// busca a linha com codLinha específico
 		linha = bin_get_linha(linha_file, "codLinha", codLinhastr);
 
@@ -857,7 +862,162 @@ ERROR operation16(char *veic_f, char *linha_f, char *index_f) {
 }
 
 
+ERROR operation17(char *veiculo_f, char *veiculo_sorted) {
+	FILE *veiculo_file = fopen(veiculo_f, "rb");
 
+	if (veiculo_file == NULL)
+		return FILE_ERROR;
+
+	VEICULO_HEADER *header = bin_get_header_veiculo(veiculo_file);
+	if (header->status == '0') {
+		fclose(veiculo_file);
+		free(header);
+		return FILE_ERROR;
+	}
+
+
+	VEICULO *veiculos[header->nroRegistros], *veiculo=NULL; 
+	int size = 0;
+
+	// insere os veiculos do arquivo no array
+	while ((veiculo=bin_get_veiculo(veiculo_file, NULL, NULL)) != NULL) {
+		if (veiculo->removido == '0') {
+			veiculo_delete(&veiculo);
+			continue;
+		}
+		veiculos[size++] = veiculo;
+	}
+
+	fclose(veiculo_file);
+
+	qsort(veiculos, header->nroRegistros, sizeof(VEICULO*), v_linha_comp);
+
+	FILE *veiculo_s_file = fopen(veiculo_sorted, "wb");
+
+	header->nroRegistros = 0;
+	header->byteProxReg = 175;
+	header->nroRegRemovidos = 0;
+	escreve_header_veiculo(veiculo_s_file, header);
+
+	for (int i=0; i<size; i++) {
+		escreve_veiculo(veiculo_s_file, header, veiculos[i]);
+		veiculo_delete(&veiculos[i]);
+	}
+	
+	escreve_header_veiculo(veiculo_s_file, header);
+
+	free(header);
+	fclose(veiculo_s_file);
+
+	return 0;
+}
+
+
+ERROR operation18(char *linha_f, char *linha_sorted) {
+	FILE *linha_file = fopen(linha_f, "rb");
+
+	if (linha_file == NULL)
+		return FILE_ERROR;
+
+	LINHA_HEADER *header = bin_get_header_linha(linha_file);
+	if (header->status == '0') {
+		fclose(linha_file);
+		free(header);
+		return FILE_ERROR;
+	}
+
+
+	LINHA *linhas[header->nroRegistros], *linha=NULL; 
+	int size = 0;
+
+	// insere os linhas do arquivo no array
+	while ((linha=bin_get_linha(linha_file, NULL, NULL)) != NULL) {
+		if (linha->removido == '0') {
+			linha_delete(&linha);
+			continue;
+		}
+		
+		linhas[size++] = linha;
+	}
+
+	fclose(linha_file);
+	
+	//sort_linhas(linhas, 0, header->nroRegistros-1);
+
+	qsort(linhas, header->nroRegistros, sizeof(LINHA*), linha_comp);
+
+	FILE *linha_s_file = fopen(linha_sorted, "wb");
+
+	header->nroRegistros = 0;
+	header->byteProxReg = 82;
+	header->nroRegRemovidos = 0;
+	escreve_header_linha(linha_s_file, header);
+
+	for (int i=0; i<size; i++) {
+		escreve_linha(linha_s_file, header, linhas[i]);
+		linha_delete(&linhas[i]);
+	}
+	
+	escreve_header_linha(linha_s_file, header);
+
+	free(header);
+	fclose(linha_s_file);
+
+	return 0;
+}
+
+ERROR operation19(char *veic_f, char *linha_f) {
+	ERROR erro;
+	//erro = operation17(veic_f, veic_f);
+
+	erro = operation17(veic_f, "veiculoordenado.bin");
+	if (erro != 0)
+		return erro;
+	erro = operation18(linha_f, "linhaordenado.bin");
+	if (erro != 0)
+		return erro;
+
+	FILE *veiculo_file = fopen("veiculoordenado.bin", "rb"),
+		 *linha_file = fopen("linhaordenado.bin", "rb");
+
+	VEICULO *veiculo = bin_get_veiculo(veiculo_file, NULL, NULL);
+	LINHA *linha = bin_get_linha(linha_file, NULL, NULL);
+
+
+
+	int count = 0;
+	while (linha != NULL && veiculo != NULL) {
+		//printf("%d\t%d\n", veiculo->codLinha, linha->codLinha);
+		if (veiculo->codLinha < linha->codLinha) {
+			veiculo_delete(&veiculo);
+			veiculo = bin_get_veiculo(veiculo_file, NULL, NULL);
+		}
+
+		else if (veiculo->codLinha > linha->codLinha) {
+			linha_delete(&linha);
+			linha = bin_get_linha(linha_file, NULL, NULL);
+		}
+
+		else {
+			//printf("---Eh igual!!!---\n\n");
+			count++;
+			print_veiculo(veiculo);
+			print_linha(linha); printf("\n");
+			veiculo = bin_get_veiculo(veiculo_file, NULL, NULL);
+		}
+		
+	}
+
+
+
+	fclose(veiculo_file);
+	fclose(linha_file);
+
+	if (count == 0)
+		return REG_NULL;
+
+	return 0;
+}
 
 
 // funcão para imprimir toda a árvore (para Debug)

@@ -3,13 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "util.h"
 
 #define BUFFER_SIZE 64
 
 
 /// Funções gerais utilizadas ///
 
-int convertePrefixo(char* str) {
+int convertePrefixo(const char* str) {
 
 	/* O registro que tem essa string como chave foi removido */
 	if(str[0] == '*')
@@ -235,4 +236,41 @@ void itoa(int num, char *buffer) {
 	} while (((int)(num/=10))>0);
 	buffer[i] = '\0';
 	reverse(buffer, i);
+}
+
+int v_linha_comp(const void *v1, const void *v2) {
+	VEICULO *vv1 = *(VEICULO* const *)v1,
+		  *vv2 = *(VEICULO* const *)v2;
+
+	return (vv1->codLinha - vv2->codLinha);
+}
+
+int linha_comp(const void *l1, const void *l2) {
+	LINHA *ll1 = *(LINHA* const *)l1,
+		  *ll2 = *(LINHA* const *)l2;
+
+	return (ll1->codLinha - ll2->codLinha);
+}
+
+// ordena veiculos/linhas por codLinha em ordem decrescente com quicksort
+
+void sort_veiculos(VEICULO **veiculos, int start, int end) {
+	VEICULO *aux = NULL;
+	int pivo = (int)((start+end)/2.0),
+		i = start, j = end;
+
+	while (i <= j) {
+		while (veiculos[i]->codLinha < veiculos[pivo]->codLinha) i++;
+		while (veiculos[j]->codLinha > veiculos[pivo]->codLinha) j--;
+		if (i <= j) {
+			aux = veiculos[i];
+			veiculos[i] = veiculos[j];
+			veiculos[j] = aux;
+			i++; j--;
+		}
+	}
+	if (start < j)
+		sort_veiculos(veiculos, start, j);
+	if (i < end)
+		sort_veiculos(veiculos, i, end);
 }

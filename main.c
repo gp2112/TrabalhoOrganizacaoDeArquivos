@@ -128,6 +128,30 @@ int main(int argc, char const *argv[]) {
 			erro = operation16(bin_fname, csv_fname, index_name);
 			break;
 
+		case (17):
+			scanf("%s", bin_fname);
+			scanf("%s", param);
+			scanf("%s", value);
+			erro = operation17(bin_fname, param);
+			if (erro==0) binarioNaTela(param);
+			break;
+
+		case (18):
+			scanf("%s", bin_fname);
+			scanf("%s", param);
+			scanf("%s", value);
+			erro = operation18(bin_fname, param);
+			if (erro==0) binarioNaTela(param);
+			break;
+
+		case (19):
+			scanf("%s", bin_fname);
+			scanf("%s", param);
+			scanf("%s", value);
+			scanf("%s", value);
+			erro = operation19(bin_fname, param);
+			break;
+
 		case (-1):
 			scanf("%s", bin_fname);
 			erro = op22(bin_fname);
