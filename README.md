@@ -1,6 +1,6 @@
 # OrganizacaoArquivosTrab1
 
-Trabalho para a disciplina de Organização de Arquivos 2021 - ICMC/USP
+Trabalho para a disciplina SCC0215 - Organização de Arquivos - ICMC/USP - 2021
 
 ### Grupo:
 * Guilherme Ramos Costa Paixão
