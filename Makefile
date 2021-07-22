@@ -1,10 +1,10 @@
 
 
 all:
-	gcc *.c -o trabalho1 -g
+	gcc src/*.c -o trabalho1
 
 run:
 	./trabalho1
 
 zip:
-	zip trabalho1.zip *.c *.h Makefile
+	zip trabalho1.zip src/* Makefile
