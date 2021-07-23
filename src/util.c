@@ -238,8 +238,7 @@ void itoa(int num, char *buffer) {
 	reverse(buffer, i);
 }
 
-
-
+///// funcões de comparação para o qsort ///
 int v_linha_comp(const void *v1, const void *v2) {
 	VEICULO *vv1 = *(VEICULO* const *)v1,
 		  *vv2 = *(VEICULO* const *)v2;
@@ -253,3 +252,4 @@ int linha_comp(const void *l1, const void *l2) {
 
 	return (ll1->codLinha - ll2->codLinha);
 }
+//////////////////////////////////////////

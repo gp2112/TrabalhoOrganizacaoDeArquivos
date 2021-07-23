@@ -710,6 +710,7 @@ ERROR operation14(char *bin_fname, char *bin_index, int n) {
 }
 
 
+// junção por força bruta (pra cada veículo lido, faz busca linear no arquivo de linha)
 ERROR operation15(char *veic_f, char *linha_f) {
 	FILE *veiculo_file = fopen(veic_f, "rb"),
 		 *linha_file = fopen(linha_f, "rb");
@@ -742,7 +743,10 @@ ERROR operation15(char *veic_f, char *linha_f) {
 	char codLinhastr[7];
 	int count=0;
 
+	// Lê veiculo até o fim do arquivo
 	while ((veiculo=bin_get_veiculo(veiculo_file, NULL, NULL)) != NULL) {
+
+		// verifica se o veículo está logicamente removido
 		if (veiculo->removido=='0') {
 			veiculo_delete(&veiculo);
 			continue;
@@ -753,12 +757,12 @@ ERROR operation15(char *veic_f, char *linha_f) {
 		// busca a linha com codLinha específico
 		linha = bin_get_linha(linha_file, "codLinha", codLinhastr);
 
-		// volta pro primeiro registro
+		// volta pro primeiro registro de linha
 		fseek(linha_file, 82, SEEK_SET);
 
+		// se encontrar a linha, imprime o veículo e a linha em seguida
 		if (linha != NULL) {
 			print_veiculo(veiculo);
-			//printf("codLinha: %d\n",veiculo->codLinha);
 			print_linha(linha);
 			linha_delete(&linha);
 			printf("\n");
@@ -781,6 +785,7 @@ ERROR operation15(char *veic_f, char *linha_f) {
 	return 0;
 }
 
+// junção de loop único (pra cada veículo lido, faz uma busca na árvore B pela linha com codLinha correspondente)
 ERROR operation16(char *veic_f, char *linha_f, char *index_f) {
 	FILE *veiculo_file = fopen(veic_f, "rb"),
 		 *linha_file = fopen(linha_f, "rb");
@@ -821,8 +826,10 @@ ERROR operation16(char *veic_f, char *linha_f, char *index_f) {
 	int64 byteoffset;
 	int count = 0;
 
+	// lê veículo até o fim do arquivo
 	while ((veiculo=bin_get_veiculo(veiculo_file, NULL, NULL)) != NULL) {
 
+		// verifica se o veículo está logicamente removido
 		if (veiculo->removido=='0') {
 			veiculo_delete(&veiculo);
 			continue;
@@ -861,13 +868,14 @@ ERROR operation16(char *veic_f, char *linha_f, char *index_f) {
 	return 0;
 }
 
-
+// Operation17-18 Ordenação do arquivo de veículo/linha em RAM
 ERROR operation17(char *veiculo_f, char *veiculo_sorted) {
 	FILE *veiculo_file = fopen(veiculo_f, "rb");
 
 	if (veiculo_file == NULL)
 		return FILE_ERROR;
 
+	// verifica o status do arquivo
 	VEICULO_HEADER *header = bin_get_header_veiculo(veiculo_file);
 	if (header->status == '0') {
 		fclose(veiculo_file);
@@ -879,7 +887,7 @@ ERROR operation17(char *veiculo_f, char *veiculo_sorted) {
 	VEICULO *veiculos[header->nroRegistros], *veiculo=NULL; 
 	int size = 0;
 
-	// insere os veiculos do arquivo no array
+	// insere os veiculos do arquivo no array, menos os removidos
 	while ((veiculo=bin_get_veiculo(veiculo_file, NULL, NULL)) != NULL) {
 		if (veiculo->removido == '0') {
 			veiculo_delete(&veiculo);
@@ -890,15 +898,18 @@ ERROR operation17(char *veiculo_f, char *veiculo_sorted) {
 
 	fclose(veiculo_file);
 
+	// ordena o array de veículos pelo codLinha
 	qsort(veiculos, header->nroRegistros, sizeof(VEICULO*), v_linha_comp);
 
 	FILE *veiculo_s_file = fopen(veiculo_sorted, "wb");
 
+	// cria e salva o header do arquivo novo ordenado
 	header->nroRegistros = 0;
 	header->byteProxReg = 175;
 	header->nroRegRemovidos = 0;
 	escreve_header_veiculo(veiculo_s_file, header);
 
+	// escreve os veiculos ordenados no arquivo novo
 	for (int i=0; i<size; i++) {
 		escreve_veiculo(veiculo_s_file, header, veiculos[i]);
 		veiculo_delete(&veiculos[i]);
@@ -919,6 +930,7 @@ ERROR operation18(char *linha_f, char *linha_sorted) {
 	if (linha_file == NULL)
 		return FILE_ERROR;
 
+	// verifica o status do arquivo
 	LINHA_HEADER *header = bin_get_header_linha(linha_file);
 	if (header->status == '0') {
 		fclose(linha_file);
@@ -930,7 +942,7 @@ ERROR operation18(char *linha_f, char *linha_sorted) {
 	LINHA *linhas[header->nroRegistros], *linha=NULL; 
 	int size = 0;
 
-	// insere os linhas do arquivo no array
+	// insere as linhas do arquivo no array, menos as removidas
 	while ((linha=bin_get_linha(linha_file, NULL, NULL)) != NULL) {
 		if (linha->removido == '0') {
 			linha_delete(&linha);
@@ -942,17 +954,19 @@ ERROR operation18(char *linha_f, char *linha_sorted) {
 
 	fclose(linha_file);
 	
-	//sort_linhas(linhas, 0, header->nroRegistros-1);
-
+	
+	// ordena o array de linhas pelo campo codLinhas
 	qsort(linhas, header->nroRegistros, sizeof(LINHA*), linha_comp);
 
 	FILE *linha_s_file = fopen(linha_sorted, "wb");
 
+	// cria e salva o header do arquivo novo ordenado
 	header->nroRegistros = 0;
 	header->byteProxReg = 82;
 	header->nroRegRemovidos = 0;
 	escreve_header_linha(linha_s_file, header);
 
+	// escreve as linhas ordenadas no arquivo novo
 	for (int i=0; i<size; i++) {
 		escreve_linha(linha_s_file, header, linhas[i]);
 		linha_delete(&linhas[i]);
@@ -966,9 +980,12 @@ ERROR operation18(char *linha_f, char *linha_sorted) {
 	return 0;
 }
 
+// Junção ordenação-Intercalação (Ordena os arquivos de veículo e linha e faz a junção em ordem)
 ERROR operation19(char *veic_f, char *linha_f) {
 	ERROR erro;
-	//erro = operation17(veic_f, veic_f);
+
+	// verifica se as operações foram feitas com sucesso
+	// caso contrário, retorna o erro correspondente
 
 	erro = operation17(veic_f, "veiculoordenado.bin");
 	if (erro != 0)
@@ -976,39 +993,43 @@ ERROR operation19(char *veic_f, char *linha_f) {
 	erro = operation18(linha_f, "linhaordenado.bin");
 	if (erro != 0)
 		return erro;
+	/////
+
 
 	FILE *veiculo_file = fopen("veiculoordenado.bin", "rb"),
 		 *linha_file = fopen("linhaordenado.bin", "rb");
 
+
 	VEICULO *veiculo = bin_get_veiculo(veiculo_file, NULL, NULL);
 	LINHA *linha = bin_get_linha(linha_file, NULL, NULL);
 
-
-
 	int count = 0;
 	while (linha != NULL && veiculo != NULL) {
-		//printf("%d\t%d\n", veiculo->codLinha, linha->codLinha);
+		
+		// se o veículo tiver um codLinha menor que o da linha atual
+		// passa para o próximo veículo do arquivo
 		if (veiculo->codLinha < linha->codLinha) {
 			veiculo_delete(&veiculo);
 			veiculo = bin_get_veiculo(veiculo_file, NULL, NULL);
 		}
 
+		// se o veículo tiver um codLinha maior que o da linha atual
+		// passa para a próxima linha
 		else if (veiculo->codLinha > linha->codLinha) {
 			linha_delete(&linha);
 			linha = bin_get_linha(linha_file, NULL, NULL);
 		}
 
+		// se os codLinha do veículo e da linha forem iguais
+		// imprime o veículo e a linha
 		else {
-			//printf("---Eh igual!!!---\n\n");
-			count++;
 			print_veiculo(veiculo);
 			print_linha(linha); printf("\n");
 			veiculo = bin_get_veiculo(veiculo_file, NULL, NULL);
+			count++;
 		}
 		
 	}
-
-
 
 	fclose(veiculo_file);
 	fclose(linha_file);
