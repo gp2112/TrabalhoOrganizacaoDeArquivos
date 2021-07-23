@@ -5,10 +5,6 @@
 
 #include "dados.h"
 
-#define TIPO_VEICULO 1
-#define TIPO_LINHA 2
-
-
 int convertePrefixo(const char* str);
 void binarioNaTela(char *nomeArquivoBinario);
 void scan_quote_string(char *str);
